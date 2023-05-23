@@ -1,0 +1,23 @@
+\section{Authentication}
+\label{sec:authentication}
+Authentication is necessary in "Outlr." as user-specific data such as created experiments of a user are stored persistently and are shown on the dashboard page of the user. For this Outlr. implements token-based authentication using JSON web tokens (JWT). 
+To ensure security a token expires after a certain duration.
+
+How the user can retrieve such a token is depicted in the following diagram:
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=\textwidth]{images/getting_access_token.svg}
+    \caption{When a user successfully logs in or registers, the API responds with an access token, which is then saved in the local storage of the users browser.}
+    \label{fig:getting-access-token}
+\end{figure}
+
+\subsubsection*{Front-end implementation:}
+As the display of the web app depends on whether a user is logged in, it must store the current authentication state of the user and switch the state when necessary. This will be implemented using vuex. When in authenticated state, the users access token and username are stored in local storage. When a token expires it is deleted from local storage and the state is changed to unauthenticated.
+
+To prevent a user from navigating routes which should only be accessed when in a certain state, navigation guards are defined for the Vue router.
+
+When accessing protected API endpoints, the token is read from local storage and passed in the authorization header of the http request.  
+\subsubsection*{Back-end implementation}
+All API endpoints are protected except "/status", "/user/register" and "/user/login".
+When no valid access token is passed in the authentication header of the http request the protected endpoints deny the API call.
+If the access token is valid the user can be read from the token and the request can be handled in user context e.g. creating an experiment for the user or retrieving all experiments the user has run.

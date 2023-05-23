@@ -1,0 +1,120 @@
+\documentclass[11pt]{scrartcl}
+\usepackage[utf8]{inputenc}
+\usepackage{blindtext}
+\usepackage{hyperref}
+\usepackage[T1]{fontenc}
+\usepackage[ddmmyyyy]{datetime} % must be after babel
+\renewcommand{\dateseparator}{.}
+\usepackage{hyperref}
+\usepackage{amsmath} % for $\text{}$
+\usepackage[nameinlink]{cleveref}
+\usepackage[section]{placeins}
+\usepackage{xcolor}
+\usepackage{svg}
+\usepackage{graphicx}
+\hypersetup{
+	pdftitle={Software Requirements Specification},
+	bookmarks=true,
+}
+\setlength{\parindent}{0pt}
+\usepackage{csquotes}
+\usepackage{srs}
+
+
+\begin{document}
+<
+    \par Disclaimer: The mockups and gui's shown in the following might deviate from the front-end design of the end product. Also some functions depicted may not appear in the end product as they are optional. The intention of this section is solely to visualize some of the defined product functions and corresponding requirements.
+    \\
+    \uimockup{Landing page}{
+    A possible way the landing page to the app might look depending on user state is shown below}{
+        \begin{figure}[h]
+        \centering
+        \includesvg[width=0.65\textwidth]{image/landing_page.svg}
+        \caption{\label{svg-landing-page} User has yet to log in. Elements depicted: sign up button, navigation bar, try out button (optional!)}
+        \end{figure}
+        \\
+        \begin{figure}[h]
+        \centering
+        \includesvg[width=0.65\textwidth]{image/landing_page_logged_in.svg}
+        \caption{\label{svg-landing-page-logged-in} User has logged in. Elements depicted: navigate to dashboard button, navigation bar, profile drop down menu}
+        \end{figure}
+        
+        }{mockup-landing-page} 
+    \mockupsProductFunction{crt:landing-page}
+    \mockupsProductFunction{crt:usr-management}
+    \mockupsRequirement{view-dashboard}
+    \mockupsRequirement{usr-create}
+    \mockupsRequirement{usr-logout}
+
+    \newpage
+    \uimockup{User Management}{
+    Since having users requires registering and logging in follwing forms exist.}{
+
+        \begin{figure}[h]
+        \centering
+        \begin{minipage}{.5\textwidth}
+          \centering
+          \includesvg[width=0.85\linewidth]{image/user_management/login.svg}
+          \captionof{figure}{login form}
+          \label{svg-login-form}
+        \end{minipage}%
+        \begin{minipage}{.5\textwidth}
+          \centering
+          \includesvg[width=0.85\linewidth]{image/user_management/register.svg}
+          \captionof{figure}{register form}
+          \label{svg-register-form}
+        \end{minipage}
+        \end{figure}
+        
+        }{mockup-login-register}
+        \mockupsProductFunction{crt:usr-management}
+        \mockupsRequirement{usr-create}
+        \mockupsRequirement{usr-login}
+        \mockupsRequirement{usr-logout}
+
+    \newpage
+
+    \uimockup{Create Experiment}{Dedicated Page allowing user to setup the experiment's parameters and the ODM's hyperparameters - in short: the page allows a user to create an experiment}{
+        \begin{figure}[h]
+        \centering
+        \includesvg[width=\textwidth]{image/create_experiment/create_experiment.svg}
+        \caption{\label{svg-create-experiment} Page for experiment creation. Elements depicted: upload .CSV file, upload ground truth file, select ODM, specify hyperparameters, experiment name textbox, dataset name textbox, dataset/.CSV file summary, run experiment button, create experiment button, suspace logic specifier}
+        \end{figure}
+    }{mockup-create-experiment}
+    \mockupsProductFunction{crt:exp-create}
+    \mockupsProductFunction{crt:exp-run}
+    \mockupsRequirement{ds-read}
+    \mockupsRequirement{gt-file}
+    \mockupsRequirement{exp-create-select-subsets}
+    \mockupsRequirement{custom-param}
+    \mockupsRequirement{odm-select}
+    \mockupsRequirement{exp-run}
+    
+    \newpage
+    \uimockup{Dashboard}{
+    The dashboard shall give the user a minimalistic but also intuitive overview of previous experiments. Optionally the user may choose to refresh, search, delete experiments, clear and sort the dashboard.}{
+        \begin{figure}[h]
+        \centering
+        \includesvg[width=\textwidth]{image/dashboard/dashboard.svg}
+        \caption{\label{svg-dashboard} Dashboard of "Outlr.". Elements depicted: table depicting previous experiments, notification, download CSV button, refresh, delete, search, clear, time span filter, sorting type button}
+        \end{figure}
+    }{mockup-dashboard}
+    \mockupsProductFunction{crt:usr-management}
+    \mockupsRequirement{usr-create}
+    \mockupsRequirement{usr-login}
+    \mockupsRequirement{usr-logout}
+
+    \newpage
+
+    \uimockup{Experiment result}{The experiment result gives an overview of a run experiment.}{
+        \begin{figure}[h]
+        \centering
+        \includesvg[width=\textwidth]{image/experiment_result/experiment_result.svg}
+        \caption{\label{svg-experiment-result} Overview of run experiment. Elements depicted: experiment summary, selected hyperparameters for odm run, detected outliers and option to download them, roc curves  (optional!)}
+        \end{figure}
+    }{mockup-exp-result}
+    \mockupsProductFunction{crt:exp-result}
+    \mockupsRequirement{experiment-summary}
+    \mockupsRequirement{download-outliers}
+    \mockupsRequirement{roc-curve}
+\end{document}

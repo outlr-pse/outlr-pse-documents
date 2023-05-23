@@ -1,0 +1,1839 @@
+\section{Object model}
+\label{sec:object-model}
+
+\subsection{External Packages}
+Outlr. utilizes a diverse array of advanced packages to provide optimal performance and functionality, while still ensuring room for scalability and own ideas.
+\newline
+\newline
+
+\package{sqlalchemy}
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=\textwidth]{images/backend_classes/sql_alchemy_backend}
+    \caption{\typeRef{sqlalchemy}}
+    \label{fig:sqlalchemy}
+\end{figure}
+\class{Enum}{
+    This class provides enum functionality, especially for databases.
+}{}
+\expandafter\package{sqlalchemy.orm.declapi} % underscore is not possible % ------------------
+\class{DeclarativeMeta}{
+    DeclarativeMeta is a metaclass provided by the \Gls{SQLAlchemy} library that is used to define \Gls{ORM} models. It allows for the declarative definition of models using class-based syntax and automates the creation of the underlying database table and columns.
+}{}
+\package{sqlalchemy.orm.session} 
+\class{Session}{
+    This class is used to manage the connection to the database, and to keep track of the changes made to the objects in the session. The session's commit method is used to persist the changes to the database and the rollback method is used to undo changes. Sessions are also used to retrieve data from the database by querying the mapped classes or by using the \Gls{ORM}'s query API.
+}{}
+\clearpage
+\package{flask} 
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=0.5\textwidth]{images/backend_classes/flask}
+    \caption{\Gls{flask}}
+    \label{fig:flask}
+\end{figure}
+\package{flask.globals.requests} 
+\class{Request}{
+    This class contains all the information about the current HTTP request. It contains data from the client, such as form data, headers, and query parameters. The request object is unique for each request, and is created by the Flask web server and provided to the view function when a request is received. 
+}{}
+\package{flask.wrappers} 
+\class{Response}{
+    This class is used to create and send an HTTP response to the client. The developer can use the response object to set the status code, headers, and body of the response. The response object can be returned directly from a view function, or it can be created and modified by the developer before being returned.
+}{}
+
+\clearpage
+
+\subsection{Front-end}
+\label{ssec:object-model-front-end}
+The front-end is developed using the \gls{vue-js} framework with \gls{typescript}. 
+
+Vue.js is a JavaScript framework that uses a component-based architecture to build user interfaces. The following terms are used in Vue.js to build a component:
+\begin{itemize}
+    \item Data: The data object of a Vue component contains the properties that the component uses to render itself.
+    \item Computed: Computed properties are used to perform calculations based on the data properties of a component and can be used in the template.
+    \item Props: Props are used to pass data from a parent component to a child component.
+    \item Components: Components are reusable Vue instances that can be used to build complex user interfaces.
+    \item Watches: Watches are used to perform an action when a specific data property changes.
+    \item Emits: Emits are used to trigger events in the parent component from a child component.
+    \item Slots: Slots are used to define areas within a component where the parent component can insert content.
+\end{itemize}
+
+Vue.js is built around a reactive data model and a template-based syntax, which makes it easy to declaratively render dynamic data into the DOM. This is not ideal for object-oriented programming, where the focus is on encapsulation and abstraction. Vue.js components are built to be very simple, flexible, and easy to use, which means that they don't have the abstraction and encapsulation features of Object-oriented languages like classes and objects, but instead it is built around a more functional and reactive programming paradigm. 
+
+To translate this into readable diagrams and still trying to model the class diagram structure, Vue components have sections for each of the above terms.
+
+Vue.js uses a concept called "views" to display multiple pages. A view in Vue.js is a component that represents a specific route or URL. When a user navigates to a specific route, the corresponding view component is rendered and displayed on the screen. Vue.js uses a library called vue-router to handle client-side routing, which maps URLs to specific view components and renders them when the user navigates to that URL. The router also allows you to define dynamic segments in the URL, which can be used to pass data to the view component, like the id of an object to be displayed. With vue.js you can also use different views for different conditions like authentication, or different views for different roles.
+ 
+To communicate with the backend, Vue.js applications typically define services, such as the auth-service.ts service. These services use the axios library to make HTTP requests to the backend and receive responses. They provide an abstraction layer between the application and the backend, allowing for a separation of concerns and making it easier to test and maintain the code. Additionally, services are used to encapsulate all the logic related to a specific backend endpoint such as authentication, authorization, or data management. This makes it possible to reuse the logic in different parts of the application and easily update it if the backend endpoint changes.
+
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=\textwidth]{images/front_end_overview_diagram}
+    \caption{Basic overview of front-end (inspired by diagram from \url{https://www.bezkoder.com/vue-3-authentication-jwt/}) }
+    \label{fig:my_label}
+\end{figure}
+
+
+\clearpage
+\package{frontend.models}
+\todo{We improved this package in the diagrams}
+\begin{figure}[h!t]
+    \centering
+    \includesvg[width=\textwidth]{images/front_end_diagrams/all_models_overview}
+    \caption{Overview of all frontend datamodels}
+    \label{fig:models_overview}
+\end{figure}
+
+\class{Experiment}{
+    This class models the Experiment with all of its required data. There are 3 different constructors for the use cases of the experiment data. Different sites have/need different data of the experiment.
+    The sites then create the experiment only with the data they have/need to ensure the sites work properly.
+    \todo{We improved this in the diagrams}
+}{
+\attributeSection{
+    \attribute*{public}{id}{number | null}
+    \attribute*{public}{name}{string}
+    \attribute*{public}{datasetName}{string | null}
+    \attribute*{public}{dataset}{file | null}
+    \attribute*{public}{groundTruth}{file | null}
+    \attribute*{public}{odm}{ODM}
+    \attribute*{public}{subspaceLogic}{SubspaceLogic | null}
+    \attribute*{public}{executionDate}{string | null}
+    \attribute*{public}{executionTime}{string | null}
+    \attribute*{public}{accuracy}{string | null}
+    \attribute*{public}{rocCurves}{Record[] | null}
+}
+\methodSection{
+    \methodWithId*{ExperimentConstructor1}{public}{Experiment}{\\
+        \tab id: number, \\
+        \tab name: string,\\
+        \tab dataset: string,\\
+        \tab odm: ODM, \\
+        \tab startTime: number,\\
+        \tab accuracy: string\\
+        }{void}
+    This method is the constructor for creating the experiments on the \typeRef{DashboardView} site.
+    \methodWithId*{ExperimentConstructor2}{public}{Experiment}{\\
+        \tab name: string,\\
+        \tab dataset: file,\\
+        \tab groundTruth: file,\\
+        \tab odm: ODM,\\
+        \tab subspaceLogic: SubspaceLogic\\
+    }{void}
+    This method is the constructor for creating the experiment on the \typeRef{CreateExperimentView} site.
+    \methodWithId*{ExperimentConstructor3}{public}{Experiment}{\\
+        \tab name: string,\\
+        \tab odm: ODM,\\
+        \tab accuracy: string,\\
+        \tab executionDate: string,\\
+        \tab executionTime: string,\\
+        \tab rocCurves: Record[]\\
+        }{void}
+    This method is the constructor for creating an experiment on the \typeRef{ExperimentResultView} site.
+}}
+
+\class{User}{
+    This class models the user.
+}{
+\attributeSection{
+    \attribute*{public}{username}{string}
+    \attribute*{public}{password}{string}
+}
+\methodSection{
+    \methodWithId*{UserConstructor1}{public}{User}{username: string, password: string}{void}
+    This method is the constructor for creating a user with a username and a password.
+    \methodWithId*{UserConstructor2}{public}{User}{json: string}{void}
+    This method is the constructor for creating a user with a json file.
+    \method*{public}{serialize}{}{string}
+    \method*{public}{deserialize}{json: string}{void}
+}}
+\implements{frontend.models}{JSONSerializable}
+\implements{frontend.models}{JSONDeserializable}
+
+\class{ODM}{
+    This class models an outlier detection method.
+}{
+\attributeSection{
+    \attribute*{publci}{name}{string}
+    \attribute*{public}{hyperparameters}{\typeRef{Hyperparameter}[]}
+}
+\methodSection{
+    \methodWithId*{UserConstructor1}{public}{ODM}{name: string, hyperparameters: \typeRef{Hyperparameter}[]}{void}
+    \methodWithId*{UserConstructor2}{public}{ODM}{json: string}{void}
+    \method*{public}{serialize}{}{string}
+    \method*{public}{deserialize}{json: string}{void}
+}}
+ \implements{frontend.models}{JSONSerializable}
+\implements{frontend.models}{JSONDeserializable}
+
+\class{Hyperparameter}{
+    This class models an Hyperparameter.
+}{
+\attributeSection{
+    \attribute*{public}{name}{string}
+    \attribute*{public}{value}{string}
+    \attribute*{public}{type}{\typeRef{HyperparameterType}}
+}
+\methodSection{
+    \method*{public}{Hyperparameter}{\\
+    \tab name: string, \\
+    \tab value: any, \\
+    \tab type: \typeRef{HyperparameterType} \\
+    }{void} 
+    \method*{public}{serialize}{}{string}
+    \method*{public}{deserialize}{json: string}{void}
+}}
+\implements{frontend.models}{JSONSerializable}
+\implements{frontend.models}{JSONDeserializable}
+
+\enum{HyperparameterType}{
+    This enum describes all possible hyperparameter types.
+}{
+\enumEntry{INTEGER} 
+\enumEntry{NUMERIC}    
+\enumEntry{STRING}    
+\enumEntry{BOOL}    
+}
+
+\interface{JSONSerializable}{
+    This interface provides the functionality of serializing an object to \gls{JSON}.
+}{
+\methodSection{
+    \method*{public}{serialize}{}{string}
+    Serialize object. Returns json as a string.
+}}
+
+\interface{JSONDeserializable}{
+    This interface provides the functionality of deserializing an object from \gls{JSON}.
+}{
+\methodSection{
+    \method*{public}{deserialize}{json: string}{void}
+    Deserialize from \gls{JSON}. This overrides the current object.
+}}
+
+\interface{SubspaceLogic}{
+    This interface represents the \gls{subspace-logic} using a composite pattern.
+}{
+\methodSection{
+    \method*{public}{serialize}{}{string}
+    \method*{public}{deserialize}{json: string}{void}
+}}
+\extends{frontend.models}{JSONSerializable}
+\extends{frontend.models}{JSONDeserializable}
+
+\class{Operation}{
+    This class represents an operation in the \gls{subspace-logic}.
+}{
+\attributeSection{
+    \attribute*{public}{operator}{\typeRef{Operator}}
+    \attribute*{public}{operands}{\typeRef{SubspaceLogic}[]}
+}
+\methodSection{
+    \methodWithId*{OperationConstructor1}{public}{Operation}{\\
+        \tab operator: \typeRef{Operator}, \\
+        \tab operands: {\typeRef{SubspaceLogic}[]\\
+    }}{void}
+    \methodWithId*{OperationConstructor2}{public}{Operation}{json: string}{void}
+    \method*{public}{serialize}{}{string}
+    \method*{public}{deserialize}{json: string}{void}
+}
+}
+\implements{frontend.models}{JSONSerializable}
+\implements{frontend.models}{JSONDeserializable}
+\implements{frontend.models}{SubspaceLogic}
+
+\enum{Operator}{
+    This enum contains all operators that the \gls{subspace-logic} syntax provides.
+}{
+    \enumEntry{AND}
+    Describes a logical and operation
+    \enumEntry{OR}
+    Describes a logical or operation
+}
+
+
+
+\class{Literal}{
+    This class represents a literal in the \gls{subspace-logic}, which is a leaf in the tree.
+}{
+\attributeSection{
+    \attribute*{public}{literal}{\typeRef{Subspace}}
+}
+\methodSection{
+    \methodWithId*{OperationConstructor1}{public}{Literal}{subspace: \typeRef{Subspace}}{void}
+    \methodWithId*{OperationConstructor2}{public}{Literal}{jason: string}{void}
+    \method*{public}{serialize}{}{string}
+    \method*{public}{deserialize}{json: string}{void}
+}
+}
+\implements{frontend.models}{JSONSerializable}
+\implements{frontend.models}{JSONDeserializable}
+\implements{frontend.models}{SubspaceLogic}
+
+\class{Subspace}{
+    This class represents a \gls{subspace}.
+}{
+\attributeSection{
+    \attribute*{public}{name}{string | null}
+    Optional name of the subspace assigned by the user.
+    \attribute*{public}{columns}{number[]}
+    List of the column indices that make up this \gls{subspace}
+}
+\methodSection{
+    \methodWithId*{OperationConstructor1}{public}{Subspace}{name: string | null, columns: number[]}{void}
+    \methodWithId*{OperationConstructor2}{public}{Subspace}{jason: string}{void}
+    \method*{public}{serialize}{}{string}
+    \method*{public}{deserialize}{json: string}{void}
+}
+}
+\implements{frontend.models}{JSONSerializable}
+\implements{frontend.models}{JSONDeserializable}
+
+\newpage
+
+\package{frontend.api}
+\begin{figure}[h!t]
+    \centering
+    \includesvg[width=\textwidth]{images/front_end_diagrams/api_frontend_package}
+    \caption{API requests package}
+    \label{fig:api_frontnend_package}
+\end{figure}
+
+\class{APIRequests}{
+Contains methods with which sending requests to the backend is handled. This class uses \typeRef{DataRetrievalService}.
+}{
+\methodSection{
+    \method*{public static}{sendDataset}{file: File}{Promise<string | null>} Sends the provided file, the dataset, to the backend. It returns a promise, which contains whether sending the file was successful (= null) or not (= string, the error message).
+    
+    \method*{public static}{sendDataset}{file: File}{Promise<string | null>} Sends the provided file, the dataset, to the back-end - Returns a promise, which contains whether sending the file was successful (= null) or not (= string, the error message
+
+    \method*{public static}{sendODM}{odm: \typeRef{ODM}}{Promise<string | null>} Sends the selected ODM to the back-end. Returns a promise, which contains whether sending the ODM, to be used, was successful (= null) or not (= string, the error message)
+    
+    \method*{public static}{sendExperimentData}{experimentData: Record}{Promise<string | null>} Sends data necessary for creation of an experiment to the back-end - Returns a promise, which contains whether sending the data necessary for experiment creation was successful (= null) or not (= string, the error message)
+
+    \method*{public static}{sendRegisterData}{username: string, password: string}{Promise<[string, string]>} Sends data necessary for creation of an experiment to the back-end - Returns a promise, which contains the access token and username, when registering was successful
+
+    \method*{public static}{sendLoginData}{username: string, password: string}{Promise<[string, string]>} Sends data necessary for logging in to the back-end - Returns a promise, which contains the access token and username, when logging in was successful 
+
+    \method*{public static}{sendLogout}{}{Promise<string | null>} Sends request to back-end to delete/invalidate the access token provided with the http request
+
+    \method*{public static}{requestTokenCheck}{}{Promise<string | null>} Sends request to back-end to validate whether the access token provided with http request still is valid - Returns null, when token still is valid and a string, the error message to be displayed, when the token has expired
+
+    \method*{public static}{requestExperimentResult}{expId: number}{Promise<\typeRef[frontend.models]{Experiment}>} Sends request to back-end to respond with the result of the experiment belonging to the user with id expId
+
+    \method*{public static}{requestExperimentResult}{experimentId: number}{Promise<\typeRef[frontend.models]{Experiment}>} Sends request to back-end to respond with (the result of) the experiment belonging to the user with id = experimentId
+
+    \method*{public static}{requestODMNames}{}{Promise<[string, id]>} Sends request to back-end to respond with all ODMs
+
+    \method*{public static}{requestODM}{odmId: number}{Promise<ODM>} Sends request to back-end to respond with the ODM with id = odmId
+}} 
+
+\class{AuthServices}{
+Handles the login, register, logout and uses \typeRef{APIRequests} to send the requests
+}{
+\methodSection{ 
+    \method*{public static}{login}{user: \typeRef[frontend.models]{User}}{Record} Handles the frontend login process by calling \memberRef{APIRequests}{sendLoginData} and evaluating its promise. The method returns a record containing either the access token and username or an error message.
+
+    \method*{public static}{register}{username: string, password: string, passwordRepeat : string}{Record} Handles the front-end register process by first validating the input and then by calling \memberRef{APIRequests}{sendRegisterData} and evaluating its promise. The method returns a record containing either the access token and username or an error message.
+
+    \method*{public static}{logout}{}{string | null}Handles the front-end logout process by deleting the access token and by calling \memberRef{APIRequests}{sendLogout} and evaluating its promise. The method returns either null, when successful, or an error message string.
+
+    \method*{public static}{validate}{}{string | null}Handles the front-end access token validation process by calling \memberRef{APIRequests}{requestTokenCheck} and evaluating its promise. The method returns either null, when successful, or an error message string. If the token has expired it is removed from local storage.
+}}
+
+\class{DataRetrievalService}{
+Contains methods easing sending requests and uses the states defined in the Vuex auth module. This class is used by \typeRef{APIRequests}.
+}{
+\methodSection{ 
+    \method*{public static}{authHeader}{}{string} Returns the authentication header containing the access token, which has to be included in the http request if the user has a valid access token. If the user is not authenticated the authentication header is "".
+}}
+
+\newpage
+
+\package{frontend.language} % ----------------------------------------------------
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=\textwidth]{images/front_end_diagrams/language_frontend}
+    \caption{\typeRef{Language}}
+    \label{fig:frontend-language}
+\end{figure}
+
+\class{Language}{Models a language and has as attributes the terms, which are assigned the corresponding translation in the language. For example, for German a \code{german} object would be created where e.g. the attribute \code{createExperiment} is assigned \code{"Neues Experiment"}.}{}
+
+\clearpage
+\package{frontend.parsers} 
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=0.6\textwidth]{images/front_end_diagrams/frontend_parsers}
+    \caption{\typeRef{SubspaceLogicParser}}
+    \label{fig:frontend-parsers}
+\end{figure}
+
+\class{SubspaceLogicParser}{
+    This class provides the functionality to parse and encode \typeRef[frontend.models]{SubspaceLogic} from and to the \gls{subspace-logic} syntax that is shown to the user. Note, that this class does not convert \typeRef[frontend.models]{SubspaceLogic} from and into \gls{JSON}.
+}{\methodSection{
+    \method*{public static}{parse}{text: string}{\typeRef[frontend.models]{SubspaceLogic} | string}
+    Parses text to a \typeRef[frontend.models]{SubspaceLogic} according to the \gls{subspace-logic} syntax. If the text does not contain a correct \gls{subspace-logic} the method returns an error string.
+
+    \method*{public static}{encode}{subspaceLogic: \typeRef[frontend.models]{SubspaceLogic}}{string}
+    Encode a \typeRef[frontend.models]{SubspaceLogic} into the \gls{subspace-logic} syntax
+
+    \method*{private static}{parseLiteral}{literal}{\typeRef[frontend.models]{SubspaceLogic}}
+    Parse a substring that represents a literal in the \gls{subspace-logic} syntax
+
+    \method*{private static}{parseOperation}{operation}{\typeRef[frontend.models]{SubspaceLogic}}
+    Parse a substring that represents an operation in the \gls{subspace-logic} syntax
+}
+}
+
+\clearpage
+\package{frontend.components.basic} 
+\begin{figure}[h!t]
+    \centering
+    \includesvg[width=\textwidth]{images/front_end_diagrams/button_input_field_diagram}
+    \caption{\typeRef{InputField}, \typeRef{Button} components with related enums}
+    \label{fig:button_and_input_field}
+\end{figure}
+
+\vueComponent{Button}{
+    Is clickable, can have an icon and has a type. Which types exist is provided by the \typeRef{ButtonType} enumeration.
+}{\propSection{
+    \attribute*{public}{text}{string}
+    Is displayed in the button. It is specified in parent component.
+    \attribute{public}{type}{ButtonType}
+    Is the current type selected for the button.
+    \attribute*{public}{startIcon}{\typeRef{Icon} | null}
+    Is the icon the \typeRef{Button} is decorated with. 
+}\emitSection{
+    \method*{public}{buttonClick}{}{void}
+    The component containing the \typeRef{Button} can listen to this event and can specify, what happens when this event, the button click occurs.
+}
+}
+
+\vueComponent{InputField}{This components allows the user to enter data, which is emitted}{
+\dataSection{
+\attribute*{private}{state}{boolean}
+    Used to know whether the input field is selected by the user.
+}\propSection{
+    \attribute*{public}{value}{string}
+    The input passed in the input field by the user is bound to the variable (of the parent component) specified for the value prop.
+    
+    \attribute*{public}{label}{string}
+    Displayed to the user to specify what should be entered.
+    
+    \attribute*[= null]{public}{placeholder}{string | null}
+    Is displayed when the InputField is empty. By default nothing is displayed as placeholder in it
+
+    \attribute*{public}{placeholder}{string | null}
+    Is displayed when the InputField is empty. By default nothing is displayed as placeholder in it
+
+    \attribute*[= null]{public}{errorMessage}{string | null}
+    Is displayed when input passed by the user causes an error. 
+
+    \attribute*{public}{selected}{boolean}
+    Is true when the component is selected. 
+
+    \attribute*[= null]{public}{startIcon}{\typeRef{Icon} | null}
+    Is the icon the \typeRef{InputField} is decorated with. It is displayed at the start, that is on the left. By default no icon is displayed.
+
+    \attribute*[= null]{public}{startIcon}{\typeRef{Icon} | null}
+    Is another icon the \typeRef{InputField} is decorated with. It is displayed at the end, that is on the right. By default no icon is displayed.
+    
+}\emitSection{
+    \method*{public}{input}{value: string}{void}
+    The component containing the \typeRef{InputField} can listen to this event and can specify, what happens when something is entered in the \typeRef{InputField} For this the value of the \typeRef{InputField} is passed with the event. 
+}
+}
+
+\enum{Icon}{
+    This enum contains all Icons that exist in the application. It also stores the source of the icon for each enum entry.
+    There will be more entries to this enum in the future.
+}{
+    \enumEntryWithValue{INFO}{"res/icons/info.svg"}
+        Is used for decorating tips. 
+    \enumEntryWithValue{CLOSE}{"res/icons/close.svg"}
+        Is the symbol used for closing, e.g. in the \typeRef{ClosableCard} component.  
+}{}
+
+\enum{ButtonType}{
+    This enum describes all possible types a button can have. They are not only used for styling but also affect e.g. the \memberRef{Button}{buttonClick} method.
+}{
+    \enumEntryWithValue{DEFAULT}{"default"}
+		Represents a default button.
+    \enumEntryWithValue{CONTRAST}{"contrast"}
+        Represents buttons with a complementary color to the color scheme (e.g. green download button).
+    \enumEntryWithValue{ACTIVE}{"active"}
+        Represents a button that is active and draws the user's focus.
+    \enumEntryWithValue{DISABLED}{"disabled"}
+        Represents a button that is not clickable at the moment.
+  
+}{\attributeSection{
+    \attribute*{private}{name}{string}
+    String representation of each enum entry to be used for \gls{CSS} classes.
+}}
+
+
+
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=0.7\textwidth]{images/front_end_diagrams/drop_down_bar}
+    \caption{drop-down bar}
+    \label{fig:drop_down_bar_component}
+\end{figure}
+
+\vueComponent{Dropdown}{
+    This component shows a drop-down bar.
+}{
+\propSection{
+    \attribute*{public}{label}{string}
+    Displayed to the user to specify what is to be selected.
+    
+    \attribute*{public}{options}{string[]}
+    Contains all dropdown entries.
+    
+    \attribute*{public}{value}{string}
+    Contains the choice the user has selected.
+    
+}
+
+\emitSection{
+    \method*{public}{input}{value: string}{void}
+    Emits the choice the user has selected.
+}
+}
+
+\newpage
+
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=\textwidth]{images/front_end_diagrams/card_to_tip}
+    \centering
+    \caption{\typeRef{Card}, \typeRef{ClosableCard} and \typeRef{Tip} component}
+    \label{fig:card_to_tip_component}
+\end{figure}
+
+\vueComponent{Card}{
+    This component shows a card.
+}{
+\slotSection{
+    \slot{default}
+        For inserting content into this card
+}
+}
+
+\vueComponent{ClosableCard}{
+    This component shows a card, which can be closed by clicking an icon.
+}{
+\propSection{
+    \attribute*[= true]{public}{value}{boolean}
+    Indicates, if the card is closed.
+    
+    \attribute*[= null]{public}{icon}{\typeRef{Icon} | null}
+    Indicates, if the card is closed.
+}
+
+\emitSection{
+    \method*{public}{input}{value: boolean}{void}
+    Emits when the card is closed or opened.
+    
+}
+\slotSection{
+    \slot{default}
+        For inserting content into this card
+}
+}
+
+\vueComponent{Tip}{
+    This component shows a tip, which can be closed.
+}{
+\propSection{
+    \attribute*{public}{text}{string}{
+        Defines the content of the tip.
+    }
+    \attribute*[= true]{public}{value}{boolean}{
+        Indicates if the card is closed.
+    }
+    \attribute*[= null]{public}{icon}{\typeRef{Icon} | null}{
+        Indicates if the card is closed.
+    }
+}
+
+\emitSection{
+    \method*{public}{input}{value: boolean}{void}{
+        Emits, when the card is closed or opened.
+    }
+}
+}
+
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=0.6\textwidth]{images/front_end_diagrams/outlr_logo}
+    \caption{\typeRef{OutlrLogo}}
+    \label{fig:outlr_logo_component}
+\end{figure}
+
+\vueComponent{OutlrLogo}{
+    This component shows the Logo of Outlr.
+}{\dataSection{
+    \attribute*{private}{path}{string}
+    Stores the path, where the logo is stored.
+}\propSection{
+    \attribute*{public}{size}{int}
+    The size, to scale the logo.
+}
+}
+
+\newpage
+
+\package{frontend.components.navigationbar}
+
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=\textwidth]{images/front_end_diagrams/navigation_bar_component}
+    \centering
+    \caption{\typeRef{NavigationBar}, \typeRef{ProfileDropdownMenu}, \typeRef{OutlrLogo}, \typeRef{UserProfile} and \typeRef{CircleWithText}}
+    \label{fig:navigation_bar}
+\end{figure}
+
+\vueComponent{NavigationBar}{
+    Allows the user to navigate the website, that is change the route etc.
+    It is always visible at the top of the website. Depending on the authentication state a login and register button or a create experiment and profile button are shown.
+}{\computedSection{
+    \attribute*{private}{isAuthenticated}{boolean}
+    Indicates whether the user is logged in to an account, which is derived from the Vuex auth module state. It is passed as a variable for the conditional rendering with the directive \code{v-if} since a login and register button or a create experiment and profile button are shown depending on the authentication state. 
+    \attribute*{private}{currentPage}{string}
+    Has the current view name as a value and is displayed in the center of the navigation bar. 
+}\componentSection{
+    \usedComponent{ProfileDropdownMenu}
+    If the user is authenticated this component is displayed on the right side of the navigation bar allowing the user to e.g. logout.
+    
+    \usedComponent{Button}
+    If the user is authenticated a create experiment button is shown and when pressed, redirects the user to the create experiment page.
+    
+    If the user is not authenticated a log in button is shown and when pressed, redirects the user to the login page.
+    
+    If the user is not authenticated a sign up button is shown and when pressed, redirects the user to the register page.
+
+    \usedComponent{OutlrLogo}
+    Is placed at the top right corner.
+    
+}\methodSection{
+    \method*{public}{redirect}{path: string}{void}
+    This (wrapper) method redirects the user to the component linked to the path passed as a parameter if a valid route path was provided. Internally this method calls a method from the Vue router for redirection.
+}}
+
+\vueComponent{ProfileDropdownMenu}{
+    This component can display a card in a dropdown style. Clicking a triangle will toggle if a card is shown. The rotation of the triangle indicates if the card is open or closed. The card shows the username and clickable text: "Logout". After clicking "Logout", the user will be logged out from his account.
+}{
+\dataSection{
+    \attribute*{private}{open}{boolean}{
+        Indicates, if the card is open or not
+    }
+    \attribute*{private}{trianglePath}{string} {
+        Contains the path, where the triangle image is stored
+    }
+}
+
+\computedSection{
+    \attribute*{public}{rotation}{string} {
+        Calculates the rotation of the triangle
+    }
+}
+
+\componentSection{
+    \usedComponent{Card}
+        Displays a card in dropdown style
+    \usedComponent{UserProfile}
+        Shows a user icon
+}
+
+\methodSection{
+    \method*{public}{redirect}{path: string}{void}
+            Redirects the user to the component linked to the path passed as a parameter
+    \method*{public}{logout}{}{void}
+            Logs the user out of his account
+}
+}
+\vueComponent{UserProfile}{
+    This component shows a user icon, consisting of the username's first letter on a purple circle with a radius.
+    This component shows a user icon, consisting of the username's first letter on a purple circle with a radius.
+}{
+\dataSection{
+    \attribute*{private}{radius}{int}{
+        Describes the radius of the circle
+    }
+}
+\propSection{
+    \attribute*{public}{content}{string}{
+        Contains the letter, which will be displayed on the circle
+    }
+}
+\componentSection{
+    \usedComponent{CircleWithText}
+        Used as a background circle
+}
+}
+\vueComponent{CircleWithText}{
+    This component draws a circle with text inside it and a given radius. The styling is defined through its style class.
+}{\computedSection{
+    \attribute*{private}{getRadius}{string}
+    Retrieves the radius for the circle
+    
+}
+\propSection{
+    \attribute*{public}{radius}{int}{
+        Describes the radius of the circle
+    }
+    \attribute*{public}{content}{string}{
+        Describes the content inside of the circle
+    }
+    \attribute*{public}{styleclass}{string}{
+        Defines the styleclass of this component
+    }
+}
+}
+\newpage
+
+\package{frontend.components.basic}
+
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=0.5\textwidth]{images/front_end_diagrams/base_table_component}
+    \caption{\typeRef{BaseTable}}
+    \label{fig:BaseTable}
+\end{figure}
+
+\newpage
+
+\vueComponent{BaseTable}{
+    This component is the base table that is used by all of our tables.
+}{
+\propSection{
+    \attribute*{public}{style}{Object}
+    contains a style for the table
+}
+\componentSection{
+    \usedComponent{ScrollLayout}
+}
+\slotSection{
+    \slot{header}
+    slot for the table header
+    \slot{body}
+    slot for the table body
+}
+}
+
+\vueComponent{ScrollLayout}{
+    This component handles the scrolling of a table. 
+}{
+\propSection{
+    \attribute*{public}{verticalScrollBar}{boolean}
+    indicates if \memberRef{ScrollLayout}{default} is vertically scrollable
+    \attribute*{public}{horizontalScrollBar}{boolean}
+    indicitas if \memberRef{ScrollLayout}{default}  is horzontally scrollable
+}
+\slotSection{
+    \slot{default}
+    slot for the scrollable tables
+    
+}
+}
+
+
+
+\newpage
+
+\package{frontend.components.views.landingpage}
+
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=0.5\textwidth]{images/front_end_diagrams/landing_page_view}
+    \caption{\typeRef{LandingPageView}}
+    \label{fig:LandingPageView}
+\end{figure}
+
+\vueComponent{LandingPageView}{
+The main purpose of the landing page view is to allow the user to welcome the user to our web application and provide easy access to common features like creating an account or navigating to the dashboard.
+}{
+\computedSection{
+     \attribute*{private}{isAuthenticated}{boolean}
+        Indicates whether the user is logged in to an account, which is derived from the Vuex auth module state.
+}
+
+\componentSection{
+    \usedComponent{Button}
+        If the user is authenticated a sign up button is shown, where the user can be directed to the sign up page.
+
+        Else, a dashboard button is shown, which redirects the user to the dashboard page.
+    \usedComponent{OutlrLogo}
+        The Logo is shown in the middle of the page.
+}
+
+\methodSection{
+    \method*{public}{redirect}{path: string}{void}
+        Redirects the user to the component linked to the path passed as a parameter if a valid route path was provided.
+}
+}
+
+\package{frontend.components.views.login}
+
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=\textwidth]{images/front_end_diagrams/login_view_login_component}
+    \caption{\typeRef{LoginView} and \typeRef{LoginForm}}
+    \label{fig:LoginView}
+\end{figure}
+
+\vueComponent{LoginView}{
+The main purpose of this view is to allow the user to log in to his account, which then when successfully logged in, can view his already created experiments on the dashboard page or create a new one on the 
+ \typeRef{CreateExperimentView}The Login view is only accessible when a user is not authenticated, see \ref{ssec:routing-back-end} for more info on this.
+}{\componentSection{
+    \usedComponent{LoginForm}
+        Used, to let the user input data into a form.
+    \usedComponent{Card}
+        Used, to display inside a card.
+}}
+
+\vueComponent{LoginForm}{
+    Is a form with 2 text input fields, one for the username and another for the password
+}{\dataSection{
+    \attribute*{private}{username}{string}
+    Is binded to the username text input field and always corresponds to the content in that input field
+    \attribute*{private}{password}{string}
+    Is binded to the password text input field and always corresponds to the content in that input field
+    \attribute*[= null]{private}{loginNoSuccessInfo}{string}
+    Carries the info provided by the API, when submitting the form data (username and password) was not successful 
+}\computedSection{
+    \attribute*{private}{formValidationInfo}{string[]}
+    Carries info on incorrectly passed form data for each input field
+}\componentSection{
+    \usedComponent{Button}
+    Is used to submit the form with the provided input data
+}\methodSection{
+    \method*{public}{onLoginFormSubmit}{}{void}
+    Method executed when \memberRef{Button}{buttonClick} event occurs.
+    Submits the data passed by the user to the back-end. If valid user data was passed the user is logged into his account and redirects him to the dashboard for which the 
+    \memberRef{LoginForm}{redirect}
+    method is used. Internally,the Vuex module auth is used for the login action.
+    \method*{public}{redirect}{path: string}{void}
+    Redirects the user to the component linked to the path passed as parameter, if a valid route path was provided
+}}
+
+\newpage
+
+\package{frontend.components.views.register}
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=\textwidth]{images/front_end_diagrams/register_view_register_component}
+    \caption{\typeRef{RegisterView} and \typeRef{RegisterForm}}
+    \label{fig:register_view}
+\end{figure}
+
+\vueComponent{RegisterView}{
+The main purpose of this view is to allow a user to create an account. The Register view is only accessible when a user is not authenticated, see \ref{ssec:routing-back-end} for more info on this.
+}{\componentSection{
+    \usedComponent{RegisterForm}
+        Used, to let User input data into a form
+    \usedComponent{Card}
+        Used, to display the form on a card
+}}
+
+\vueComponent{RegisterForm}{
+    Is a form with 3 text input fields, one for the username, another for the password and the last for the password, which has to be reentered. Each text input field is bound to a data property.
+}{\dataSection{
+    \attribute*{private}{username}{string}
+    The username data variable is bound to the username text input field and always corresponds to the content in that input field.
+    \attribute*{private}{password}{string}
+    The password data variable is bound to the password text input field and always corresponds to the content in that input field.
+    \attribute*{private}{passwordRepeated}{string}
+    Is bound to the password repeated text input field and always corresponds the content in that input field.
+    \attribute*[= null]{private}{registerNoSuccessInfo}{string}
+    Carries the info provided by the API, when submitting the form data was not successful
+}\computedSection{
+    \attribute*{private}{formValidationInfo}{string[]}
+    Carries info on incorrectly passed form data for each input field
+}\componentSection{
+    \usedComponent{Button}
+    Is used to submit the form with the provided input data
+}\methodSection{
+    \method*{public}{onRegisterFormSubmit}{}{void}
+    Method executed when \memberRef{Button}{buttonClick} event occurs. It submits the data passed by the user to the back-end and. If valid user data was passed and if the username is not already used, creates an account for the user and redirects him to his (empty) dashboard, for which \memberRef{RegisterForm}{redirect} is used.
+    \method*{public}{redirect}{path: string}{void}
+    Redirects the user to the component linked to the path passed as parameter, if a valid route path was provided
+}}
+
+\clearpage
+
+\package{frontend.components.views.dashboard}
+
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=1\textwidth]{images/front_end_diagrams/dashboard_view}
+    \caption{\typeRef{DashboardView}, \typeRef{DashboardTable} and \typeRef{SearchBar}}
+    \label{fig:DashboardView}
+\end{figure}
+\clearpage
+
+
+\vueComponent{DashboardView}{
+    This component gives the user an overview of all his experiments. The user can access the Experiments to review their results by clicking on the Experiment in the Table.
+}{\dataSection{
+    \attribute*{private}{tableHeaders}{any[]}
+    Contains the Headers for the \typeRef{DashboardTable}
+    \attribute*{private}{tableData}{any[]}
+    Contains the data for every experiment the user has created
+    \attribute*{private}{filteredTableData}{any[]}
+    is given to the \typeRef{DashboardTable} to display the data
+    The array is per default the same as the table data but gets altered when the user filters the table. When the user clears the filter the array is set back to the default.
+    \attribute*{private}{experiments}{Experiment}
+    Contains the experiments in its experiment class form. The array is used to extract the data from each experiment to then insert it into the \memberRef{DashboardView}{tableData} array.
+}
+\componentSection{
+    \usedComponent{DashboardTable}
+        This component is used to display the Experiments of a user in a Table.
+        
+    \usedComponent{SearchBar}
+        This component is an input field where the user can input a search term. The \typeRef{DashboardTable} is then filtered to display only those experiments that contain the search term in some way.
+        
+    \usedComponent{ClosableCard}
+        This component is used to display information to the User.
+        It is intended to show a hint on how to select one or multiple rows in the \typeRef{DashboardTable}.
+        
+    \usedComponent{Button}
+        The clear search Button is used to reset the \memberRef{SearchBar}{searchTerm} and the \typeRef{DashboardTable} to their default state.
+}       
+\methodSection{
+    \method*{public}{applySearch}{searchTerm: string}{void}
+    The method filters the \memberRef{DashboardView}{tableData} array making it only contain rows that include the \memberRef{SearchBar}{searchTerm} in some way. The result then gets saved in \memberRef{DashboardView}{filteredTableData}  array.
+    
+    \method*{public}{onExperimentClick}{experiment}{void}
+    The method redirects the user to the \typeRef{ExperimentResultView} and sends the experiment id that the user clicked to the \typeRef{ExperimentResultView} component.
+    
+    \method*{public}{mounted}{}{void}
+    This method requests all experiments of the user from the backend.\ref{dashboard_load}.
+}}
+
+\vueComponent{DashboardTable}{
+    This component is the table component for the dashboard. It contains the styling of the table and handles the functions that are executed when the user clicks on the table.
+}{
+\propSection{
+    \attribute*{public}{tableHeader}{string[]}
+    Contains the headers of the table
+    \attribute*{public}{tableData}{any[]}
+    Contains the data of the table
+    
+}
+\componentSection{
+    \usedComponent{BaseTable}
+        This component is used for the basic table structure and style of the DashboardTable
+}
+\methodSection{
+    \method*{public}{headerClicked}{header: string}{void}
+    This method emits the \memberRef{DashboardTable}{headerClicked} with the clicked header.
+    \method*{public}{rowClicked}{row: any[]}{void}
+    This method emits the \memberRef{DashboardTable}{rowClicked} with the clicked row.
+}
+\emitSection{
+    \method*{public}{headerClicked}{header: string}{void}
+    Allows the parent component to specify what happens when the header is clicked.
+    \method*{public}{rowClicked}{row: any[]}{void}
+    Allows the parent component to specify what happens when the row is clicked.
+}
+}
+\vueComponent{SearchBar}{
+    This Component is an input field for the user. It is used for filtering the \typeRef{DashboardTable}.
+}{
+\dataSection{
+    \attribute*{public}{searchTerm}{string}
+    contains the user input of the input field
+}
+\methodSection{
+    \method*{public}{clear}{}{void}
+    This method resets the \memberRef{SearchBar}{searchTerm} to an empty string.
+}
+\watchSection{
+    \methodWithId*{searchTermWatch}{private}{searchTerm}{}{void}
+    watches the \memberRef{SearchBar}{searchTerm} and emits the \memberRef{SearchBar}{searchTerm} on change
+}
+\emitSection{
+    \method*{public}{searchTermChanged}{searchTerm: string}{void}
+    Allows the parent component to specify what happens on \memberRef{SearchBar}{searchTermChanged}.
+}
+}
+
+\clearpage
+\package{frontend.components.views.createexperiment}
+
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=0.7\textwidth]{images/front_end_diagrams/experiment_create_view}
+    \caption{\typeRef{CreateExperimentView}}
+    \label{fig:CreateExperimentVeiw}
+\end{figure}
+
+\vueComponent{CreateExperimentView}{
+    This component is the main component to create an Experiment
+}{
+\dataSection{
+    \attribute*{private}{tableHeaders}{string[]}
+    Contains the headers of the dataSetPreview table
+    \attribute*{private}{tableData}{any[]}
+    Contains the data of the dataSetPreview table
+    \attribute{private}{experiment}{Experiment}
+    Contains the experiment and is updated every time the user inputs something
+}
+\componentSection{
+    \usedComponent{ODMSection}
+    Contains the input fields for the selection of the \gls{ODM}.
+    \usedComponent{SubspaceLogicField}
+    \usedComponent{UploadFileField}
+    \usedComponent{ExperimentTitleField}
+    \usedComponent{Button}
+    Button to create the experiment
+}
+\methodSection{
+    \method*{public}{onODMChange}{odm: \typeRef{ODM}}{void}
+    This method sets the \typeRef{ODM} of the experiment when the user selects something and enters hyperparameters.
+    
+    \method*{public}{onTitleChange}{tilte: string}{void}
+    This method sets the name of the experiment when the user inputs something.
+    
+    \method*{public}{onDataSetUpload}{file: File}{void}
+    This method is executed when the user uploads a dataset.
+    It then sends the file to the backend for verification.
+    
+    \method*{public}{onGroundTruthUpload}{file: File}{void}
+    This method is executed when the user uploads a ground thruth file.
+    It then sends the file to the backend for verification.
+    
+    \method*{public}{onSubspaceLogicChange}{subspaceLogic: \typeRef{SubspaceLogic}}{void}
+    This method inserts the \typeRef{SubspaceLogic} into the experiment attribute.
+    
+    \method*{public}{onExperimentCreate}{}{void}
+    This method is executed when the create experiment button is pressed.
+    It calls the corresponding api request function to send the created experiment to the backend.
+}
+}
+
+\vueComponent{ODMSection}{
+    This Component contains the functions and components that are necessary for the \typeRef{ODM} selection.
+}{
+\dataSection{
+    \attribute*{private}{selectedODM}{\typeRef{ODM}}
+    contains the \typeRef{ODM} element
+    \attribute*{private}{odmNames}{[string, int][]}
+    contains a tuple array of all available \gls{ODM} names with their corresponding ids
+}
+\componentSection{
+    \usedComponent{Dropdown}
+    This component lets the user select and \typeRef{ODM} from the \memberRef{ODMSection}{odmNames} array.
+    \usedComponent{HyperparameterSection}
+}
+\methodSection{
+    \method*{public}{onOdmSelection}{odmID: int}{void}
+    This method requests the \typeRef{ODM}, the user selected, from the backend.
+    \method*{public}{requestODMNames}{}{void}
+    This method requets the list of all available \typeRef{ODM} from the backend
+    \method*{public}{onParameterChange}{}{void}
+    This method emits \memberRef{ODMSection}{odmChange}.
+}
+\emitSection{
+    \method*{public}{odmChange}{odm: ODM}
+    Allows the parent component to specify what happens on odmChange.
+}}
+
+\vueComponent{HyperparameterSection}{
+    This component is for the hyperparameter selection. It is visible when the user selected a specific \typeRef{ODM}.
+}{
+\dataSection{
+    \attribute*{private}{visible}{boolean}
+    indicates, if parameters are visible or not
+}
+\propSection{
+    \attribute*{public}{parameters}{\typeRef{Hyperparameter}[]}
+    contains the hyperparameters of the selected \typeRef{ODM}
+}
+\componentSection{
+   \usedComponent{ParameterInputField}
+   These components allow the user to input the hyperparameters.
+}
+\methodSection{
+    \method*{public}{inputChange}{value: string, id: number}{void}
+    This method emits the \memberRef{HyperparameterSection}{hyperparameterChange} with the value as string and the parameterID as number.
+    \method*{public}{toggle}{}{void}
+    This method toggles the visibility of the \typeRef{HyperparameterSection}
+}
+\emitSection{
+    \method*{public}{hyperparameterChange}{}{void}
+    Allows the parent component to specify what happens when the hyperparmeters change.
+}
+}
+
+\vueComponent{ParameterInputField}{
+    This component is an input field for an parameters with a specific type. It shows some kind of indicatin when the user trys to insert a wrong type.
+}{
+\dataSection{
+    \attribute*{private}{value}{string}
+    contains the user input
+}
+\propSection{
+    \attribute*{public}{placeholder}{string}
+    contains the name of the parameter 
+    \attribute*{public}{parameterID}{number}
+    contains the id of the parameter the input field is for
+}
+\methodSection{
+    \method*{public}{wrongInput}{}{void}
+    This method shows the user some indication when the \memberRef{ParameterInputField}{value} has the wrong type that is needet for the parameter.
+    \method*{public}{correctInput}{}{void}
+    This method shows the user some indication when the \memberRef{ParameterInputField}{value} is in the correct type.
+}
+\watchSection{
+    \methodWithId*{valueWatch}{private}{value}{}{void}
+    This method emits the changed \memberRef{ParameterInputField}{input}
+}
+\emitSection{
+    \method*{public}{input}{value: string, parameterID: number}{void}
+    This method allows the parent component to specify what happens when the input changes.
+}
+}
+
+
+\vueComponent{ExperimentTitleField}{
+    This component is an Input field specify for the task of changing the experiment name.
+}{
+\propSection{
+    \attribute*{public}{value}{string}
+    contains the user input
+}
+\watchSection{
+    \methodWithId*{valueWatch}{private}{value}{}{void}
+    This method emits the changed \memberRef{ExperimentTitleField}{input}.
+}
+\emitSection{
+    \method*{public}{input}{value: string}{void}
+    This method allows the parent component to specify what happens when the input changes.
+}
+}
+
+\vueComponent{UploadFileField}{
+    This component is for the upload of a File. 
+}{
+\methodSection{
+    \method*{public}{onFileChange}{event: Event}{void}
+    This method gets an event when the user uploads a file. It then emits the \memberRef{UploadFileField}{fileChanged} to the parent component.
+}
+\emitSection{
+    \method*{public}{fileChanged}{file: File}{void}
+    This method allows the parent component to specify what happens when the file changes.
+}
+}
+
+\vueComponent{SubspaceLogicField}{
+    This component is an input where the user can input a subspace logic. When the input is correct the parsed string gets emitted. 
+}{
+\dataSection{
+    \attribute*{private}{textInput}{string}
+    contains the user input
+}
+\propSection{
+    \attribute*{public}{value}{SubspaceLogic | None}
+    can contain a subspace logic when provided by the parent component
+}
+\componentSection{
+    \usedComponent{SubspaceLogicTip}   
+}
+\watchSection{
+    \methodWithId*{textInputWatch}{private}{textInput}{}{void}
+    This method trys to parse the subspace logic when the user inserts something. When the subspace logic can be parsed the \memberRef{SubspaceLogicField}{input} is emitted.
+}
+\emitSection{
+    \method*{public}{input}{value: SubspaceLogic}{void}
+    This method allows the parent component to specify what happens when a correct subspace logic is inserted.
+}
+}
+
+\vueComponent{SubspaceLogicTip}{
+    This component contains some tips for the user on how the \gls{subspace-logic} syntax works.
+}{}
+
+
+
+\clearpage
+\package{frontend.components.views.experimentresult}
+
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=1\textwidth]{images/front_end_diagrams/frontend_experimentresult}
+    \caption{\typeRef{ExperimentResultView}}
+    \label{fig:frontend-experimentresult}
+\end{figure}
+
+
+
+\vueComponent{ExperimentResultView}{
+    This component gives the user an detailed overview of an experimnt. 
+}{
+\dataSection{
+    \attribute*{private}{experiment}{Experiment}
+    contains the experiment and all of its data
+}
+\componentSection{
+    \usedComponent{Button}
+    The download button can be used to download data of the experiment.
+    \usedComponent{ExperimentSummaryCard}
+    \usedComponent{DataTable}
+    This component is a table for showing data of the experiment
+    \usedComponent{RocCurvesCard}
+}
+\methodSection{
+    \method*{public}{downloadFile}{}{void}
+    This method starts a download to a file.
+    \method*{public}{mounted}{}{void}
+    This method requests the experiment from the backand an inserts it into the \memberRef{ExperimentResultView}{experiment} attribute.
+}
+}
+
+\vueComponent{DataTable}{
+    This component is a table that can show the data that is provided.
+}{
+\propSection{
+    \attribute*{public}{tableHeader}{string[]}
+    contains the strings for the headers
+    \attribute*{public}{tableData}{any[]}
+    contains the data that is shown in the table
+}
+\componentSection{
+    \usedComponent{BaseTable}
+}
+}
+
+\vueComponent{ExperimentSummaryCard}{
+    This component is a card that shows a summary of the experiment result.
+}{
+\propSection{
+    \attribute*{public}{experiment}{Experiment}
+    contains the experiment to display the summary
+}
+\componentSection{
+    \usedComponent{Card}
+}
+}
+
+\vueComponent{RocCurvesCard}{
+    This component is a card that shows the \glspl{roc-curve}.
+}{
+\propSection{
+    \attribute*{public}{experiment}{Experiment}
+    contains the experiment to display the \glspl{roc-curve}.
+}
+\componentSection{
+    \usedComponent{Card}
+}
+}
+
+
+
+
+\clearpage
+\label{ssec:object-model-back-end}
+\subsection{Backend}
+The back-end mainly relies on the libraries \Gls{flask}, \Gls{PyOD}, and \Gls{SQLAlchemy}. Flask is for creating the API, PyOD provides ODMs, pandas is for dataset handling and SQLAlchemy allows easy database access and ORM. In the following, the usage and interaction of these libraries will be illustrated.
+
+
+\package{backend} % ----------------------------
+\class{Application}{
+    This class is the entry point of the backend and defines a global state. It sets up the ODMs in the database and starts the API.
+}{\attributeSection{
+    \attributeWithId*{experimentscheduler}{private}{experiment\_scheduler}{\typeRef[backend.experimentexecution]{ExperimentScheduler}}
+    Defines which scheduler should be used for experiment execution.
+    
+    \attributeWithId*{odmproviders}{private}{odm\_providers}{dict[\typeRef[backend.models.odm]{ODMType}, \typeRef[backend.odmprovider]{ODMProvider}]}
+    Contains a mapping for every \typeRef[backend.models.odm]{ODMType} to their provider. Allows for scraping ODMs from multiple sources. If an \typeRef[backend.models.odm]{ODMType} is mapped to a provider, each \typeRef[backend.models.odm]{ODM} of this type is marked as deprecated. The provider then returns which \glspl*{ODM} of the given type are available from now on. The provider is not allowed to modify \glspl*{ODM} of any other type.
+}\methodSection{
+    \methodWithId*{runodmproviders}{private}{run\_odm\_providers}{}{None}
+    Collects all ODMs using the \memberRef{Application}{odmproviders}
+
+    \methodWithId*{startapi}{private}{start\_api}{}{None}
+    Starts the API.
+}}
+
+\clearpage
+\package{backend.api} % ----------------------------
+\class{API}{
+    This class manages the routes of the API.
+}{
+\methodSection{
+    \method*{public}{status}{}{\typeRef[flask.wrappers]{Response}}
+        Always returns status code "200 OK". Can be used by clients to check if the API is reachable.
+}}
+\class{ExperimentAPI}{
+    This class defines API endpoints which are experiment related.
+}{
+\methodSection{
+    \methodWithId*{validatedataset}{public}{validate\_dataset}{}{\typeRef[flask.wrappers]{Response}}
+        Requires a jwt access token.
+        Expects a dataset as a CSV file in the request.
+        Returns status code "200 OK" if the dataset was valid, "400 Bad Request" with message "Invalid dataset." otherwise.
+    \methodWithId*{validategroundtruth}{public}{validate\_ground\_truth}{}{\typeRef[flask.wrappers]{Response}}
+        Requires a jwt access token.
+        Expects a ground truth file as a CSV file in the request. Returns status code "200 OK" if the ground truth file was valid, "400 Bad Request" with message "Invalid dataset." otherwise.
+    \methodWithId*{getresult}{public}{get\_result}{}{\typeRef[flask.wrappers]{Response}}
+        Requires a jwt access token.
+        Expects the experiment id in the request. If the experiment was found, returns status code "200 OK" and the experiment results encoded as json. If there is no experiment with the given ID it returns "404 Not Found".
+    \methodWithId*{getall}{public}{get\_all}{}{\typeRef[flask.wrappers]{Response}}
+        Requires a jwt access token.
+        Returns a list of all experiments the user has encoded as json and status code "200 OK".
+    \method*{public}{create}{}{\typeRef[flask.wrappers]{Response}}
+        Requires a jwt access token.
+        Expects an experiment encoded as json in the request. Inserts the experiment in the database and runs it.
+    \methodWithId*{downloadresult}{public}{download\_result}{}{\typeRef[flask.wrappers]{Response}}
+        Requires a jwt access token.
+        Expects the experiment id in the request. If the experiment was found, returns a CSV file with all the outliers from the given experiment and status code "200 OK". If there is no experiment with the given ID it returns "404 Not Found".
+}}
+\class{UserManagementAPI}{
+    This class defines API endpoints which are user management related.
+}{
+\methodSection{
+    \method*{public}{register}{}{\typeRef[flask.wrappers]{Response}}
+        Expects a username and a password in the request. Inserts a new user into the database if username and password are valid and returns a jwt access token.
+    \method*{public}{login}{}{\typeRef[flask.wrappers]{Response}}
+        Expects a username and a password in the request.
+        If username and password were correct a jwt access token and the status code "200 OK" is returned, status code "401 Unauthorized" otherwise.
+    \methodWithId*{checktoken}{public}{check\_token}{}{\typeRef[flask.wrappers]{Response}}
+        Requires a jwt access token.
+        Returns status code "200 OK" if the provided access token is still valid.
+}}
+\class{ODMAPI}{
+    This class defines API endpoints for retrieving available ODMs.
+}{
+\methodSection{
+    \methodWithId*{getall}{public}{get\_all}{}{\typeRef[flask.wrappers]{Response}}
+        Requires a jwt access token.
+        Returns a list of all ODMs available to the user encoded as json and status code "200 OK".
+    \methodWithId*{getparameters}{public}{get\_parameters}{}{\typeRef[flask.wrappers]{Response}}
+        Requires a jwt access token.
+        Expects an ODM id.
+        Returns a list of all parameters the given ODM has encoded as json and status code "200 OK" if the ODM was found, status code "400 Bad Request" otherwise.
+}}
+
+\clearpage
+\package{backend.database} % ----------------------------
+
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=\textwidth]{images/backend_classes/database_overview}
+    \caption{database package with \typeRef{DatabaseAccess} class}
+    \label{fig:database_overview}
+\end{figure}
+
+
+\class{DatabaseAccess}{
+    This class handles all database access methods.
+}{
+\attributeSection{
+    \attribute*{private}{session}{\typeRef{Session}}
+}
+\methodSection{
+    \methodWithId*{addExperiment}{public}{add\_experiment}{experiment: \typeRef[backend.models.experiment]{Experiment}}{void}
+    Write an experiment to the database
+    
+    \methodWithId*{getExperiment}{public}{get\_experiment}{id: int}{\typeRef[backend.models.experiment]{Experiment}}
+    Read the experiment with the given \code{id} from the database
+    
+    \methodWithId*{getUserExperiments}{public}{get\_user\_experiments}{user: \typeRef[backend.models.user]{User}}{list[\typeRef[backend.models.experiment]{Experiment}]} 
+    Read a list of all experiments created by a user from the database
+    
+    \methodWithId*{addUser}{public}{add\_user}{user: \typeRef[backend.models.user]{User}}{void}
+    Write a user to the database
+    
+    \methodWithId*{getUser}{public}{get\_user}{id: int}{\typeRef[backend.models.user]{User}}
+    Read the user with the given \code{id} from the database
+    
+    \methodWithId*{getUser}{public}{get\_user}{name: str}{\typeRef[backend.models.user]{User}}
+    Read the \typeRef[backend.models.user]{User} with the given \code{id} from the database
+    
+    \methodWithId*{addOdm}{public}{add\_odm}{odm: \typeRef[backend.models.odm]{ODM}}{void}
+    Write an \typeRef[backend.models.odm]{ODM} to the database
+    
+    \methodWithId*{getOdm}{public}{get\_odm}{id: int}{\typeRef[backend.models.odm]{ODM}}
+    Read the \typeRef[backend.models.odm]{ODM} with the given \code{id} from the database
+}}
+
+
+\clearpage
+\package{backend.models.experiment} % ----------------------------
+
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=0.7\textwidth]{images/backend_classes/models_experiment}
+    \caption{experiment package}
+    \label{fig:experiment}
+\end{figure}
+
+
+\class{Experiment}{
+    This class represents the experiment table.
+}{
+\attributeSection{
+    \attribute*{public}{id}{int | None}
+    \attributeWithId*{userId}{public}{user\_id}{int}
+    \attribute*{public}{name}{str}
+    \attribute*{public}{dataset}{\typeRef[backend.models.dataset]{Dataset}}
+    \attributeWithId*{groundTruth}{public}{ground\_truth}{Dataset}
+    \attribute*{public}{odm}{\typeRef[backend.models.odm]{ODM}}
+    \attributeWithId*{paramValues}{public}{param\_values}{dict[str, Any]}
+    \attributeWithId*{subspaceLogic}{public}{subspace\_logic}{\typeRef[backend.models.subspacelogic]{SubspaceLogic}}
+    \attribute*{public}{result}{\typeRef[backend.models.results]{ExperimentResult} | None}
+}
+\methodSection{
+    \methodWithId*{init}{public}{\_\_init\_\_}{\\
+    \tab id: int \\
+    \tab user\_id: int \\
+    \tab name: str \\
+    \tab dataset: \typeRef[backend.models.dataset]{Dataset} \\
+    \tab ground\_truth: \typeRef[backend.models.dataset]{Dataset} \\
+    \tab odm: \typeRef[backend.models.odm]{ODM} \\
+    \tab param\_values: dict[str, Any] \\
+    \tab subspace\_logic: \typeRef[backend.models.subspacelogic]{SubspaceLogic} \\
+    \tab result: \typeRef[backend.models.results]{ExperimentResult} | None \\
+    }{void}
+}
+}
+
+
+
+\clearpage
+\package{backend.models.dataset} % ----------------------------
+
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=\textwidth]{images/backend_classes/models_dataset}
+    \caption{dataset package}
+    \label{fig:dataset}
+\end{figure}
+
+\class{Dataset}{
+    This class represents the dataset table.
+}{
+\attributeSection{
+    \attribute*{public}{name}{str | None}
+    \attribute*{public}{data}{pandas.DataFrame}
+}
+\methodSection{
+    \methodWithId*{init}{public}{\_\_init\_\_}{name: str, data: pandas.DataFrame}{void}
+}
+}
+
+
+\clearpage
+\package{backend.models.user} % ----------------------------
+
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=0.6\textwidth]{images/backend_classes/models_user}
+    \caption{\typeRef[backend.models.user]{User}}
+    \label{fig:frontend-models-user}
+\end{figure}
+
+\class{User}{
+    This class represents the user table.
+}{
+\attributeSection{
+    \attribute*{public}{id}{int | None}
+    \attribute*{public}{name}{str}
+    \attribute*{public}{password}{str}
+}
+\methodSection{
+    \methodWithId*{init}{public}{\_\_init\_\_}{username: str, password: str}{void}  
+}
+}
+
+
+
+\clearpage
+\package{backend.models.odm} 
+
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=\textwidth]{images/backend_classes/odm_models_backend}
+    \caption{Contains classes and enumerations, which have to do with the ODM. These are: \typeRef[backend.models.odm]{ODM}, 
+    \typeRef[backend.models.odm]{Hyperparameter},
+    \typeRef[backend.models.odm]{HyperparameterType},
+    \typeRef[backend.models.odm]{ODMType}}
+    \label{fig:backend_models_odm}
+\end{figure}
+
+\class{ODM}{Models an \gls{ODM} on the backend}{
+\attributeSection{
+\attribute*{public}{id}{int | None}
+Assigns the ODM an id, which is also used in the database
+
+\attribute*{public}{name}{str}
+
+\attribute*{public}{params}{list[\typeRef[backend.models.odm]{Hyperparameter}]}
+
+\attribute*{public}{deprecated}{bool}
+
+\attribute*{public}{type}{\typeRef[backend.models.odm]{ODMType}}
+}
+\methodSection{
+    \methodWithId*{init}{public}{\_\_init\_\_}{id: int | None, name: str, params: list[\typeRef[backend.models.odm]{Hyperparameter}], deprecated: bool, type: \typeRef[backend.models.odm]{ODMType}}{void}
+
+    \methodWithId*{checkparams}{private}{check\_param}{values: dict[str, Any]}{bool}
+    Checks whether the values passed, which should be used for the parameters, would be valid parameters for the \gls{ODM}
+}
+}
+
+\class{Hyperparameter}{
+Models a hyperparameter for an \typeRef[backend.models.odm]{ODM}
+}{
+\attributeSection{
+\attribute*{public}{name}{str}
+\attribute{public}{type}{HyperparameterType}
+\attribute*{public}{optional}{bool}
+}
+
+\methodSection{
+    \methodWithId*{init}{public}{\_\_init\_\_}{name: str, type: \typeRef[backend.models.odm]{HyperparameterType}, optional: bool}{void}
+}
+}
+
+\enum{HyperparameterType}{
+Defines what type a hyperparameter has
+}{
+        \enumEntry{INTEGER}
+		\enumEntry{NUMERIC}
+		A number, which can also be a float
+        \enumEntry{STRING}
+        \enumEntry{BOOL}
+}{}
+
+\enum{ODMType}{Defines of what type the ODM is, that is e.g. if the ODM is from the \gls{PyOD} library}{
+        \enumEntry{PYOD}
+		ODM is from the \gls{PyOD} library
+		\enumEntry{OUTLR}
+		ODM from us
+}{}
+\clearpage
+\package{backend.models.subspacelogic} % ------------------------------
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=1\textwidth]{images/backend_classes/models_subspacelogic}
+    \caption{\typeRef[backend.models.subspacelogic]{SubspaceLogic}, \typeRef[backend.models.subspacelogic]{Literal} and \typeRef[backend.models.subspacelogic]{Operation}}
+    \label{fig:backend-models-subspacelogic-claseses}
+\end{figure}
+
+\interface{SubspaceLogic}{
+    This interface represents the \gls{subspace-logic} using a composite pattern.
+}{\methodSection{
+    \method*{public}{evaluate}{}{list[int]}
+    Evaluates the \gls{subspace-logic}
+
+    \methodWithId*{getsubspaces}{public}{get\_subspaces}{}{set[\typeRef[backend.models.results]{Subspace}]}
+    Returns the subspaces that are contained in the \gls{subspace-logic}
+}}
+
+\class{Literal}{
+    This class represents a literal in the \gls{subspace-logic}, which is a leaf in the tree.
+}{\attributeSection{
+    \attribute*{private}{subspace}{\typeRef[backend.models.results]{Subspace}}
+    Contains a single subspace as part of the \gls{subspace-logic}
+}\methodSection{
+    \method*{public}{evaluate}{}{list[int]}
+    Evaluates the \gls{subspace-logic}. It is required that all contained \memberRefLong{Literal}{subspace} have a valid result specified in \memberRefLong{Subspace}{outliers}.
+
+    \methodWithId*{getsubspaces}{public}{get\_subspaces}{}{set[\typeRef[backend.models.results]{Subspace}]}
+    Returns the subspaces that are contained in the \gls{subspace-logic}
+}}
+\implements{backend.models.subspacelogic}{SubspaceLogic}
+
+\class{Operation}{
+    This class represents an operation in the \gls{subspace-logic}.
+}{\attributeSection{
+    \attribute*{private}{operands}{\typeRef[backend.models.subspacelogic]{SubspaceLogic}}
+    Contains the operands of the operation.
+    
+    \attribute*{private}{operands}{Callable[[list[list[int]]], list[int]]}
+    A function that defines the combination of integer lists where each integer is either \code{1} or \code{0}. An easy example would be a logical operation that acts pointwise on its inputs.
+    
+}\methodSection{
+    \method*{public}{evaluate}{}{list[int]}
+
+    \methodWithId*{getsubspaces}{public}{get\_subspaces}{}{set[\typeRef[backend.models.results]{Subspace}]}
+}}
+\implements{backend.models.subspacelogic}{SubspaceLogic}
+
+
+\clearpage
+\package{backend.models.results}
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=1\textwidth]{images/backend_classes/models_result}
+    \caption{\typeRef{ExperimentResult}, \typeRef{Subspace} and \typeRef{Outlier}}
+    \label{fig:backend-experimentexecution}
+\end{figure}
+
+\class{ExperimentResult}{
+        This class represents the ExperimentResult table in our database, where each row is mapped
+		to its corresponding Python object by sqlAlchemy.
+        It contains information about the result of the experiment.
+}{
+\attributeSection{
+    \attribute*{public}{accuracy}{float | None}
+    \attributeWithId*{executiondate}{public}{execution\_date}{datetime}
+    \attributeWithId*{executiontime}{public}{execution\_time}{timedelta}
+    \attribute*{public}{subspaces}{list[\typeRef{Subspace}]}
+    {A list of all subspaces which have been specified by the subspace logic.}
+    \attribute*{public}{outliers}{list[\typeRef{Outlier}]}{A list of data points which have been detected as outliers in any of the subspaces.}
+}
+\methodSection{
+\methodWithId*{init}{public}{\_\_init\_\_}{accuracy: float | None,
+    execution\_date: datetime,
+    execution\_time: timedelta,
+    subspaces: list[\typeRef{Subspace}],
+    outliers: list[\typeRef{Outlier}], roc\_curve: json}{void}
+}
+
+}
+
+\class{Subspace}{
+    This class represents the Subspace table in our database, where each row is mapped
+	to its corresponding Python object by sqlAlchemy.
+    It contains information of a subspace and outliers, which lie in this subspace.
+}{
+\attributeSection{
+    \attribute*{public}{id}{int | None}
+    \attribute*{public}{columns}{list[int]}
+    A list of column numbers the subspace consists of.
+
+    \attribute*{public}{outliers}{list[\typeRef{Outlier}]}
+    All outliers which have been found on the subspace when the experiment was run.
+
+    \attributeWithId*{experimentresult}{public}{experiment\_result}{\typeRef{ExperimentResult}}
+    A reference to the \typeRef{ExperimentResult} this subspace belongs to.
+
+    \attributeWithId*{roccurve}{public}{roc\_curve}{json}
+    Saves the \Gls{roc-curve} data. Stored for each subspace, to allow for scalability.
+}
+}
+
+\class{Outlier}{
+    This class represents the outlier table in our database, where each row is mapped
+	to its corresponding Python object by sqlAlchemy.
+    It contains information, about a datapoint, which is an outlier in at least one subspace.
+}{
+\attributeSection{
+
+    \attribute*{public}{index}{int}
+    \attributeWithId*{experimentresult}{public}{experiment\_result}{\typeRef{ExperimentResult}}
+    A reference to the \typeRef{ExperimentResult} this outlier belongs to.
+    \attribute*{public}{subspaces}{list[\typeRef{Subspace}]}
+    A list of subspaces this outlier is in.datapoints
+}
+}
+
+\clearpage
+\package{backend.experimentexecution}
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=1\textwidth]{images/backend_classes/experimentexecution_schedulers}
+    \caption{\typeRef{ExperimentScheduler}, \typeRef{QueueExperimentScheduler}, \typeRef{ConcurrentExperimentScheduler}, \typeRef{ODMScheduler}, \typeRef{QueueODMScheduler}, \typeRef{ConcurrentODMScheduler}}
+    \label{fig:backend-experimentexecution}
+\end{figure}
+
+\class[abstract ]{ExperimentScheduler}{
+    This abstract class represents a scheduler that can schedule the execution of an \gls{experiment}.
+}{\attributeSection{
+    \attributeWithId{odmscheduler}{protected}{odm\_scheduler}{ODMScheduler}
+    Is used to schedule the individual \glspl{ODM}. This uses the dependency injection design pattern. 
+}\methodSection{
+    \method*{public}{schedule}{experiment: \typeRef[backend.models.experiment]{Experiment}}{Awaitable[\typeRef{ExperimentResult} | \typeRef{ExecutionError}]}
+    Schedule an experiment
+}}
+
+\class{QueueExperimentScheduler}{
+    This class is a scheduler that schedules the execution of \glspl{experiment} in a single new thread where all incoming experiments are queued.
+}{\attributeSection{
+    \attribute*{private}{queue}{list[\typeRef[backend.models.experiment]{Experiment}]}
+    The queue of experiments that need to be run
+}\methodSection{
+    \method*{public}{schedule}{experiment: \typeRef[backend.models.experiment]{Experiment}}{Awaitable[\typeRef{ExperimentResult} | \typeRef{ExecutionError}]}
+}}
+\extends{backend.experimentexecution}{ExperimentScheduler}
+
+\class{ConcurrentExperimentScheduler}{
+    This class is a scheduler that schedules the execution of \glspl{experiment} concurrently. Since concurrent execution is an optional feature the details of this class can be worked out later.
+}{\methodSection{
+    \method*{public}{schedule}{experiment: \typeRef[backend.models.experiment]{Experiment}}{Awaitable[\typeRef{ExperimentResult} | \typeRef{ExecutionError}]}
+}}
+\extends{backend.experimentexecution}{ExperimentScheduler}
+
+\interface{ODMScheduler}{
+    This interface represents a scheduler that can schedule the execution of an \gls{ODM}.
+}{\methodSection{
+    \method*{public}{schedule}{\\
+        \tab odm: \typeRef[backend.models.odm]{ODM},\\
+        \tab subspace: \typeRef[backend.models.results]{Subspace}\\
+    }{Awaitable[list[int] | \typeRef{ExecutionError}]}
+    Schedule an \gls{ODM}
+}}
+
+\class{QueueODMScheduler}{
+    This class is a scheduler that schedules the execution of \glspl{ODM} in a single new thread where all incoming experiments are queued.
+}{\attributeSection{
+    \attribute*{private}{queue}{list[\typeRef[backend.models.experiment]{Experiment}]}
+    The queue of \glspl{ODM} that need to be run
+}\methodSection{
+    \method*{public}{schedule}{\\
+        \tab odm: \typeRef[backend.models.odm]{ODM},\\
+        \tab subspace: \typeRef[backend.models.results]{Subspace}\\
+    }{Awaitable[list[int] | \typeRef{ExecutionError}]}
+    Schedule an \gls{ODM}
+}}
+\implements{backend.experimentexecution}{ODMScheduler}
+
+\class{ConcurrentODMScheduler}{
+    This class is a scheduler that schedules the execution of \glspl{ODM} concurrently. Since concurrent execution is an optional feature the details of this class can be worked out later.
+}{\methodSection{
+    \method*{public}{schedule}{\\
+        \tab odm: \typeRef[backend.models.odm]{ODM},\\
+        \tab subspace: \typeRef[backend.models.results]{Subspace}\\
+    }{Awaitable[list[int] | \typeRef{ExecutionError}]}
+    Schedule an \gls{ODM}
+}}
+\implements{backend.experimentexecution}{ODMScheduler}
+\clearpage
+
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=1\textwidth]{images/backend_classes/experimentexecution_error}
+    \caption{\typeRef{ExecutionError}, \typeRef{UnknownODMError} and \typeRef{ODMFailureError}}
+    \label{fig:backend-experimentexecution}
+\end{figure}
+
+\interface{ExecutionError}{
+    This class describes an error that can occur during the execution of an \gls{experiment}.
+}{\methodSection{
+    \method*{public}{serialize}{}{str}
+    Returns a \gls{JSON} representation of the error that can be sent to the frontend
+
+    \methodWithId*{debugmessage}{public}{debug\_message}{}{str}
+    Returns a readable string representation that is meant to be displayed only for debugging purposes
+}}
+
+\class{UnknownODMError}{
+    This class describes the error case that the ODM is unknown to its \typeRef{ODMRunner}.
+    This error indicates a programming or database setup error and should not occur under normal conditions.
+}{\attributeSection{
+    \attribute{public}{odm}{ODM}
+    The \typeRef{ODM} that was unknown to its \typeRef{ODMRunner}
+}\methodSection{
+    \method*{public}{serialize}{}{str}
+    \methodWithId*{debugmessage}{public}{debug\_message}{}{str}
+}}
+\implements{backend.experimentexecution}{ExecutionError}
+
+\class{ODMFailureError}{
+    This class describes the error case that the ODM failed internally.
+    This error cannot be fixed by the application and should be displayed to the user.
+}{\attributeSection{
+    \attribute{public}{odm}{ODM}
+    The \typeRef{ODM} that was used
+
+    \attribute*{public}{dataset}{\typeRef[backend.models.dataset]{Dataset}}
+    The \typeRef[backend.models.dataset]{Dataset} that was used
+
+    \attribute*{public}{hyperparams}{dict[str, Any]}
+    The \glspl{hpp} that were used
+
+    \attributeWithId*{odmmessage}{public}{odm\_message}{str}
+    A message containing a readable representation of the internal \gls{ODM} error
+}\methodSection{
+    \method*{public}{serialize}{}{str}
+    \methodWithId*{debugmessage}{public}{debug\_message}{}{str}
+}}
+\implements{backend.experimentexecution}{ExecutionError}
+
+\clearpage
+\package{backend.odmrunner} % ----------------------------
+
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=1\textwidth]{images/backend_classes/backend_odmrunner}
+    \caption{\typeRef{PyODRunner} and \typeRef{ODMRunner}}
+    \label{fig:backend-experimentexecution}
+\end{figure}
+
+\interface{ODMRunner}{
+    This interface provides the functionality to run an \typeRef[backend.models.odm]{ODM}. It represents an adapter pattern, which makes it possible to run \glspl*{ODM} from many different sources. An instance of this interface must not be able to run all \typeRef[backend.models.odm]{ODM}.
+}{\methodSection{
+    \methodWithId*{runodm}{public}{run\_odm}{\\
+        \tab odm: \typeRef[backend.models.odm]{ODM},\\
+        \tab dataset: \typeRef[backend.models.dataset]{Dataset},\\
+        \tab hyperparams: dict[str, Any]\\
+    }{list[int] | \typeRef[backend.experimentexecution]{ExecutionError}}
+    Run the \gls{ODM}. At index $i$ in the returned list is a \code{1} if the $i$th datapoint of the dataset was identified as an outlier and a \code{0} if not. If the \typeRef[backend.models.odm]{ODM} cannot be run by this instance of \typeRef{ODMRunner} the method returns \typeRef[backend.experimentexecution]{UnknownODMError}
+}}
+
+\class{PyODRunner}{
+    This class provides the functionality to run \glspl{ODM} from the \gls{PyOD} \gls{python} module.
+}{\methodSection{
+    \methodWithId*{runodm}{public}{run\_odm}{\\
+        \tab odm: \typeRef[backend.models.odm]{ODM},\\
+        \tab dataset: \typeRef[backend.models.dataset]{Dataset},\\
+        \tab hyperparams: dict[str, Any]\\
+    }{list[int] | \typeRef[backend.experimentexecution]{ExecutionError}}
+    Run the \gls{ODM}. \typeRef{PyODRunner} can only run \typeRef[backend.models.odm]{ODM} of type \memberRefLong{ODMType}{PYOD}.
+}}
+\implements{backend.odmrunner}{ODMRunner}
+
+\clearpage
+\package{backend.odmprovider} % ----------------------------
+
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=0.7\textwidth]{images/backend_classes/backend_odmprovider}
+    \caption{\typeRef{ODMProvider} and \typeRef{PyODScraper}}
+    \label{fig:backend-odmprovider}
+\end{figure}
+
+\interface{ODMProvider}{
+    This interface provides the functionality to provide \typeRef[backend.models.odm]{ODM} instances.
+}{\methodSection{
+    \methodWithId*{nextodm}{public}{next\_odm}{}{\typeRef[backend.models.odm]{ODM}}
+    Return the next \typeRef[backend.models.odm]{ODM}. This method should be implemented as a coroutine that yields one \typeRef[backend.models.odm]{ODM} at a time.
+}}
+
+\class{PyODScraper}{
+    This class provides the functionality to scrape the \gls{PyOD} \gls*{python} module to retrieve the \typeRef[backend.models.odm]{ODM} instances that \gls{PyOD} provides.
+}{\methodSection{
+    \methodWithId*{nextodm}{public}{next\_odm}{}{\typeRef[backend.models.odm]{ODM}}
+}}
+\implements{backend.odmprovider}{ODMProvider}
+
+\clearpage
+\package{backend.parsers} % ----------------------------
+
+\class{DatasetCSVParser}{
+    This class provides a method to parse a dataset.
+}{
+\methodSection{
+    \method*{public static}{parse}{dataset: str}{\typeRef[backend.models.dataset]{Dataset}}
+}
+}
+
+\class{GroundTrtuhCSVParser}{
+    This class provides a method to parse a ground truth file.
+}{
+\methodSection{
+    \methodWithId*{groundTruth}{public static}{parse}{ground\_truth: str}{list[int]}
+}
+}
+
+\class{OutlierCSVEncoder}{
+    This class provides a method to encode an outlier list.
+}{
+\methodSection{
+    \method*{public static}{encode}{outliers: list[int]}{str}
+}
+}

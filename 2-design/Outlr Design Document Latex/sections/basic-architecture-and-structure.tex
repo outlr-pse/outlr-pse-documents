@@ -1,0 +1,100 @@
+\section{Basic architecture and structure}
+\subsection{3-Tier}
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=0.5\textwidth]{images/three_tier_architecture.svg}
+    \caption{3-Tier Architecture}
+    \label{fig:three-tier-architecture}
+\end{figure}
+
+"Outlr." is designed as a 3-Tier architecture, meaning that the application consists of following three tiers: 
+\begin{itemize}
+    \item The presentation tier: Allows the user to interact with the application. HTML, CSS and Javascript, along with the frameworks listed in \ref{sec:technology_used} under the frontend section is used to provide the user interface.
+     \item The application tier has two main tasks:
+     \begin{itemize}
+         \item It provides an API allowing for communication with the presentation tier using HTTP requests. This will be implemented using the web micro framework Flask written in python. An overview of provided API endpoints is given in \ref{ssec:routing-back-end}. Authentication is also handled by Flask and is further explained in \ref{sec:authentication}.
+         \item It executes the business logic, which means running experiments created by users. 
+     \end{itemize}
+     \item The data tier: Stores all information about users, ODMs and experiments which need to be available permanently in a PostgreSQL database. As the application tier is object oriented we use SQLAlchemy as an object relational mapper.
+     A detailed overview of what is stored in the data base is provided in \ref{sec:database}.
+     
+     Technology used in the application and data tier is also listed in \ref{sec:technology_used} under the backend section.
+\end{itemize}
+
+
+\subsection{Technology used}
+\label{sec:technology_used}
+As stated in the software requirements specification we decided on:
+\subsubsection*{As frontend technology:}
+\begin{itemize}
+    \item \Gls{typescript} $\geq 4.9$
+    \item \Gls{vue-js} $\geq 3.2.45$ (using Vuex\footnote{see \ref{sec:authentication} for an explanation on what Vuex is and how it is used for "Outlr."} and Vue Router\footnote{see \ref{ssec:routing-front-end} for its usage})
+    \item \Gls{HTML}
+    \item \Gls{CSS}
+\end{itemize}
+    
+\subsubsection*{As backend technology:}
+\begin{itemize}
+    \item \Gls{python} $\geq 3.11.0$
+    \item \Gls{postgresql} $\geq 15$
+    \item \Gls{SQLAlchemy} $\geq 1.4.46 $
+    \item \Gls{pandas} $\geq 1.5.2$
+    \item \Gls{numpy} $\geq 1.24.1 $
+    \item \Gls{PyOD} $\geq 1.0.6$
+    \item \Gls{flask} $\geq 2.2.3$   
+\end{itemize}
+
+for our implementation phase.
+
+\subsection{Deviation from OOP}
+Since the frameworks we rely on for development listed in \ref{sec:technology_used}, are not developed in an object oriented manner, it is not possible to make Outlr. fully object oriented.
+However, to still achieve the advantages of OOP we utilize a combination of OOP and non-OOP, where the non-OOP parts are optimized for OOP characteristics such as encapsulation or modularity.
+
+\newpage
+\subsection{Module structure}
+\label{sec:module-structure}
+
+\subsubsection*{Frontend package structure}
+The following diagram depicts the package structure of the frontend:
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=0.55\textwidth]{images/package_structure_front_end.svg}
+    \caption{package structure of the frontend}
+    \label{fig:package_structure_front_end}
+\end{figure}
+
+\pagebreak
+
+The frontend consists of the usual Vue packages:
+    \begin{itemize}
+        \item assets: images, svgs and .css files used for the website's appearance
+        \item components and views \footnote{detailed overview in \ref{ssec:object-model-front-end}}
+        \item router \footnote{detailed overview in \ref{ssec:routing-front-end}}
+        \item store: contains all (Vuex) state management related files such as the authentication state module and an index.ts file initialising/exporting a store, to which the authentication module is subscribed, for the web app to use.  
+    \end{itemize}
+and is extended with 
+     \begin{itemize}
+        \item models: here types and classes are defined, which are used in the web app. For example, the User.ts model is used for authentication related tasks and Experiment.ts e.g. is used on the dashboard page.  
+        \item services: provide a set of functionality needed in a certain part of the web app. For example, the auth-service sends the authentication related http requests using methods defined in APIRequests and handles changes to the local storage depending on the response. The data-retrieval-service.ts service includes methods easing http requests, e.g. a method, which returns the authorization header, which should be passed when an API call requires a token/authentication. 
+    \end{itemize}
+
+\newpage
+
+\subsubsection*{Frontend package diagram}
+
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=\textwidth]{images/frontend_packagediagram}
+    \caption{package diagram of the frontend}
+    \label{fig:package_diagram_front_end}
+\end{figure}
+\newpage
+\subsubsection*{Backend package diagram}
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=\textwidth]{images/backend_packagediagram}
+    \caption{package diagram of the backend}
+    \label{fig:package_diagram_back_end}
+\end{figure}
+
+\newpage

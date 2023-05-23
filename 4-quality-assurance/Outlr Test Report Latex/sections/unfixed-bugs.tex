@@ -1,0 +1,19 @@
+\section{Unfixed bugs}
+
+% Write all bugs that we intend to fix in the fixed bugs section. If we don't fix it we can move it here in the end
+
+\bugWithoutFix{Executor shuts down\notReproducible}{
+    When scheduling an experiment sometimes one of the following exceptions is raised
+    \begin{itemize}
+        \item \emph{RuntimeError: cannot schedule new futures after interpreter shutdown}
+        \item \emph{RuntimeError: cannot schedule new futures after shutdown}
+    \end{itemize}
+}{
+    Unknown. The bug occurs rarely and cannot be reproduced reliably. It could be caused by modifying a python file while the server is running.
+}
+
+\bugWithoutFix{Supervised methods are displayed but not runnable}{
+    Supervised methods are not supported but displayed on the create Page.
+}{
+    When scraping the PyOD module the methods are not checked on whether they are supervised or unsupervised.
+}

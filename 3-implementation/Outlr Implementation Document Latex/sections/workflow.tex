@@ -1,0 +1,39 @@
+\section{Workflow}
+
+\subsection*{Project management}
+Our project is divided into tasks (see \ref{sec:timeline}).
+Most tasks are the implementation of a package or sometimes individual classes. The goal is that all tasks need a similar amount of time to complete.
+
+The dev branch is the main branch of the project and it is protected.
+Each task is implemented on a separate feature branch that gets merged into the dev branch using a merge request.
+
+Each task goes through the following phases:
+\begin{enumerate}
+    \item Not started: Task is not currently worked on
+    \item In progress: The assigned team member is currently working on the task on a feature branch. Once the task is ready a merge request is created.
+    \item Review: The task is ready, but needs to be reviewed by the assigned reviewer. The following requirements must be fulfilled before the merge request is accepted:
+    \begin{itemize}
+        \item The implemented feature should work as defined in the design phase
+        \item Type annotations should be used in method signatures
+        \item Documentation in the form of docstrings or TSDoc should be present on all public classes, attributes, and methods
+        \item Basic unit tests should be implemented and all unit tests must pass
+        \item Linter tests must pass
+        \item There should be no merge conflicts
+    \end{itemize}
+    If a task does not fulfill these requirements it goes back to the previous phase.
+    \item Done: The task is completed
+\end{enumerate}
+We use kanban boards in \gls{notion} to manage this workflow.
+
+\subsection*{Continuous integration}
+Our git repository is managed on \gls{gitlab}.
+Continuous integration automates some parts of the review process.
+Once a commit is pushed to a feature branch of the repository the app is built, the database is set up, and unit tests, as well as a lint test, is run automatically.
+If any of these steps fail the merge request of the feature branch cannot be merged to the dev branch.
+
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=\textwidth]{images/workflow-light-variant}
+    \caption{Task phases}
+    \label{fig:workflow}
+\end{figure}

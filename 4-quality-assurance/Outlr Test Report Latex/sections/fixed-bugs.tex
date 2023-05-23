@@ -1,0 +1,52 @@
+\section{Fixed bugs}
+
+\bugFix{The accuracy calculation after running an \gls{ODM} is flawed. }{
+    After viewing the results of an \Gls{experiment} the accuracy is always displayed incorrectly as 0.
+}{
+    When converting the ground truth \gls{CSV} to a \gls{numpy} array, the header was included, even though the ground truth does not have one. This led to a data loss of one row. Then the accuracy calculation was done using our own method, which compares two \gls{numpy} arrays in a single statement. However, when comparing two arrays of different size, it will always return 0, thus leading to this bug.
+}{
+    Now, we fixed the conversion and use the accuracy method from scikit-learn to ensure accurate results.
+}
+
+\bugFix{The user is not redirected from routes requiring authentication when authentication "suddenly" is not valid anymore, even after a single page reload}{
+    The token expire event is not handled, when a page requiring authentication is already loaded. This way, the user is seemingly able to communicate with the backend although not being logged in, that is the user seeminly has a valid access token. Since no request is responded to with useful information the user might reload the page, which however, also does not directly redirect to the login page. This way, the user is in a state where nothing seems to work as the user is not redirected to login page nor is able to send requests to the backend.
+}{
+    The token expire event is not handled correctly as the \code{isAuthenticated} state is not set when the token expires. Even if this state was properly set according to token validity, no action would take place since the authentication state has to be listened to.
+}{
+    Now, the user is redirected when the user triggers a component sending a http request to the backend. Furthermore, a single page reload now redirects to the login page when a route requiring authentication is trying to be accessed. This was handling the token expiration event correctly on frontend side by setting the Vuex state according to the token's validity when http requests are sent as well as listening to the Vuex state change (similarly to observer pattern) by subscribing to the state change.
+}
+
+\bugFix{Running \glspl*{experiment} can fail}{
+    Running an \gls*{experiment} sometimes raises an exception from \gls{SQLAlchemy}.
+}{
+    Every API request uses the same \gls*{SQLAlchemy} session. The objects that are created and modified during the execution are still in the session while the experiment is running. (Objects with relationships to objects that are already in the session will automatically be added to the session.) When the session is automatically flushed or when it is flushed by another API request while the experiment is still running, \gls*{SQLAlchemy} needs to work with these objects. But they can be in a state that is not accepted by the database. For example, the \code{execution\_time} of \code{ExperimentResult} must not be \code{None}, but can only be defined after the execution has been completed. In this case, \gls*{SQLAlchemy} raises an exception.
+}{
+    Now each API Request has its own session as it is intended by the \gls*{SQLAlchemy} documentation.
+    Additionally, the API request that starts the execution now closes the session before starting the execution and uses a second session to write the changes back to the database once the execution has finished.
+}
+
+\bugFix[wrong-odm-exceptions]{Exceptions from \glspl{ODM} too unspecific}{
+    Exceptions raised by \glspl{ODM} should be instances of \code{ODMFailureError}. Instead, they are instances of more general exception classes.
+}{
+    Exceptions from \glspl{ODM} are not wrapped in the \code{ODMFailureError} exception class.
+}{
+    Now, exception handling is added to the \code{PyODM} class to raise \code{UnknownODMError}s and \code{ODMFailureError}s.
+}
+
+
+\bugFix{Exceptions from \glspl{ODM} not caught}{
+    Exceptions raised by \gls{PyOD} \glspl{ODM} are not caught when using the \code{ExecutorODMScheduler} with a \code{ProcessPoolExecutor}. This causes the execution to crash instead of finish with an error. It can also lead to a broken process pool with the following error message: \emph{BrokenProcessPool: A process in the process pool was terminated abruptly while the future was running or pending.}
+}{
+    The exceptions that are raised by \code{PyODM.run\_odm} are constructed using keyword arguments. When constructing them by passing the same arguments without a keyword, the bug does not occur. It is unclear why this happens.
+}{
+    The given exceptions are now constructed using positional arguments.
+}
+
+
+\bugFix{kwargs}{
+    'kwargs' parameters are recognized as mandatory but are optional.
+}{
+    They do not have a default value.
+}{
+    Set parameters named 'kwargs' to optional.
+}

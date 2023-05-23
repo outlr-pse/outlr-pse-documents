@@ -1,0 +1,250 @@
+\ProvidesPackage{srs}
+\RequirePackage{xcolor}
+\RequirePackage{rdfref-user,rdfref-query}
+
+% cross referencing
+\newcommand\tests[1]{%
+  \AddTripleEx{#1}{pfl:is-tested}{yeah}
+  \AddProperty{pfl:tests}{#1}}
+\newcommand\fulfills[1]{%
+  \AddTripleEx{#1}{pfl:is-fulfilled}{yeah}
+  \AddProperty{pfl:fulfills}{#1}}
+\newcommand\testLink[1]{\hyperref[#1]%
+  {\GetProperty{#1}{pfl:tstid}}}
+\newcommand\requirementsLink[1]{\hyperref[#1]%
+  {\GetProperty{#1}{pfl:fncid}}}
+  
+\newcommand\productFunctionLink[1]{\hyperref[#1]%
+  {\GetProperty{#1}{pfl:crtid}}}
+\newcommand\marginid[1]{\marginpar{\centering\textbf{#1}}}
+
+\newcommand\PrefixMussKriterium{FM}
+\newcommand\PrefixKannKriterium{FO}
+\newcommand\PrefixAbgrenzungsKriterium{D}
+\newcommand\PrefixMandatoryRequirement{RM}
+\newcommand\PrefixOptionalRequirement{RO}
+\newcommand\PrefixTest{T}
+
+\newcommand\functional[1] {
+    \AddProperty{pfl:funktional}{#1}
+}
+
+\newcommand\nonFunctional[1] {
+    \AddProperty{pfl:nichtFunktional}{#1}
+}
+
+\newcommand\mandatoryRequirementTest[3]{
+  \stepcounter{mandatoryRequirement}
+  \par\textbf{#1}\IfProperty{#3}{pfl:funktional}{ (functional)}{}
+    \IfProperty{#3}{pfl:nichtFunktional}{ (non-functional)}{}\phantomsection\rdflabel{#3}
+  \marginid{{\IfProperty{#3}{pfl:is-tested}{}{\color{red}}\PrefixMandatoryRequirement\arabic{mandatoryRequirement}}}
+  \AddPropertyEx{pfl:fncname}{#1}
+  \AddPropertyEx{pfl:fncid}{\PrefixMandatoryRequirement\arabic{mandatoryRequirement}}
+  
+  \IfProperty{#3}{pfl:is-tested}{%
+    \\ \emph{Tested by:} \Bind{?t}{pfl:tests}{#3}{ \testLink{\GetVal{?t}} }
+  }{{\color{red}{Not tested}}\\}
+  %\emph{Implements:}\Bind{#3}{pfl:fulfills}{?c}{ \productFunctionLink{\GetVal{?c}} }
+  % my addition
+  \IfProperty{#3}{pfl:fulfills}{
+    \emph{Implements:}\Bind{#3}{pfl:fulfills}{?c}{ \productFunctionLink{\GetVal{?c}} }
+  }{{\color{red} No corresponding product function}}
+  \IfProperty{#3}{pfl:covered-by-mockup}{%
+    \\ \emph{Mockups:} \Bind{?m}{pfl:mockupsRequirement}{#3}{ \mockupLink{\GetVal{?m}} }
+  }
+  % addition end
+  \par{#2}
+  \vspace{\baselineskip}
+}
+
+
+%additions for mockup feature
+\newcounter{uimockupstepthrough}
+\newcounter{uimockupstep}[uimockupstepthrough]
+
+\newcommand\PrefixMockUp{M}
+
+\newcommand\mockupLink[1]{\hyperref[#1]%
+  {\GetProperty{#1}{pfl:mockupid}}}
+  
+\newcommand\mockupsProductFunction[1] {
+  \AddTripleEx{#1}{pfl:covered-by-mockup}{yeah}
+  \AddProperty{pfl:mockupsProductFunction}{#1}}
+  
+\newcommand\mockupsRequirement[1] {
+  \AddTripleEx{#1}{pfl:covered-by-mockup}{yeah}
+  \AddProperty{pfl:mockupsRequirement}{#1}}
+
+% title of mockup, description of mockup stepthrough, stepthroughs, label
+\newcommand\uimockup[4]{
+    \stepcounter{uimockupstepthrough}
+    \par\textbf{#1}\phantomsection\rdflabel{#4}
+    \marginid{\PrefixMockUp\arabic{uimockupstepthrough}}
+    \AddPropertyEx{pfl:mockupid}{\PrefixMockUp\arabic{uimockupstepthrough}}
+    %\\ \emph{Mockups:}\Bind{#3}{pfl:mockupsProductFunction}{?c} \Bind{#3}{pfl:mockupsRequirement}{?f}{ \requirementsLink{\GetVal{?f}}
+    \IfProperty{#4}{pfl:mockupsProductFunction}{
+    \\ \emph{Product functions:}\Bind{#4}{pfl:mockupsProductFunction}{?c}{
+    \productFunctionLink{\GetVal{?c}} }}
+    
+    \IfProperty{#4}{pfl:mockupsRequirement}{
+    \\ \emph{Requirements:} \Bind{#4}{pfl:mockupsRequirement}{?f}{ \requirementsLink{\GetVal{?f}}} }
+    
+    \par {#2}
+    \vspace{\baselineskip} {#3} %stepthroughs
+    \vspace{\baselineskip}
+}
+
+% imagine url, caption, label
+\newcommand\uimockupstep[3]{
+    \\
+    \stepcounter{uimockupstep}
+    \textbf{Step \arabic{uimockupstep}:}
+    \begin{figure}[!ht]
+    \includesvg[width=\textwidth]{#1}
+    \caption{\label{#3} #2}
+    \end{figure}
+    \par
+}
+
+% imagine url, caption, label
+\newcommand\uimockupnostep[3]{
+    \begin{figure}[!ht]
+    \includesvg[width=0.85\textwidth]{#1}
+    \caption{\label{#3} #2}
+    \end{figure}
+    \par
+}
+
+\newcounter{productFunctionMust}
+\newcounter{productFunctionOptional}
+\newcounter{delimitation}
+\newcounter{mandatoryRequirement}
+\newcounter{optionalRequirement}
+\newcounter{test}
+\newcounter{teststep}[test]
+
+% document macros
+\newcommand\productFunctionMust[3]{
+  \stepcounter{productFunctionMust}
+  \par\textbf{#1}\phantomsection\rdflabel{#3}
+  \marginid{{\IfProperty{#3}{pfl:is-fulfilled}{}{\color{red}}\PrefixMussKriterium\arabic{productFunctionMust}}}
+  \AddPropertyEx{pfl:crtname}{#1}
+  \AddPropertyEx{pfl:crtid}{\PrefixMussKriterium\arabic{productFunctionMust}}
+  \IfProperty{#3}{pfl:is-fulfilled}{%
+    \\ \emph{Implemented by:} \Bind{?f}{pfl:fulfills}{#3}{ \requirementsLink{\GetVal{?f}} }
+  }{{\color{red}{}}}
+  %my addition
+  \IfProperty{#3}{pfl:covered-by-mockup}{%
+    \\ \emph{Mockups:} \Bind{?m}{pfl:mockupsProductFunction}{#3}{ \mockupLink{\GetVal{?m}} }
+  }
+  %addition end
+  
+  \par{#2}
+  \vspace{\baselineskip}
+  }
+
+\newcommand\productFunctionOptional[3]{
+  \stepcounter{productFunctionOptional}
+  \par\textbf{#1}\phantomsection\rdflabel{#3}
+  \marginid{{\IfProperty{#3}{pfl:is-fulfilled}{}{}\PrefixKannKriterium\arabic{productFunctionOptional}}}
+  \AddPropertyEx{pfl:crtname}{#1}
+  \AddPropertyEx{pfl:crtid}{\PrefixKannKriterium\arabic{productFunctionOptional}}
+  \IfProperty{#3}{pfl:is-fulfilled}{%
+    \\ \emph{Implemented by:} \Bind{?f}{pfl:fulfills}{#3}{ \requirementsLink{\GetVal{?f}} }
+  }{{\color{red}}}
+  \par{#2}
+  \vspace{\baselineskip}
+  }
+
+\newcommand\delimitation[2]{
+  \stepcounter{delimitation}
+  \par\textbf{#1}\phantomsection\rdflabel{#2}
+  \marginid{\PrefixAbgrenzungsKriterium\arabic{delimitation}}
+  \AddPropertyEx{pfl:crtname}{#1}
+  \AddPropertyEx{pfl:crtid}{\PrefixAbgrenzungsKriterium\arabic{delimitation}}
+  \par}
+
+\newcommand\mandatoryRequirement[3]{
+  \stepcounter{mandatoryRequirement}
+  \par\textbf{#1}\IfProperty{#3}{pfl:funktional}{ (functional)}{}
+    \IfProperty{#3}{pfl:nichtFunktional}{ (non-functional)}{}\phantomsection\rdflabel{#3}
+  \marginid{{\IfProperty{#3}{pfl:is-tested}{}{}\PrefixMandatoryRequirement\arabic{mandatoryRequirement}}}
+  \AddPropertyEx{pfl:fncname}{#1}
+  \AddPropertyEx{pfl:fncid}{\PrefixMandatoryRequirement\arabic{mandatoryRequirement}}
+  \IfProperty{#3}{pfl:is-tested}{%
+    \\ \emph{Tested by:} \Bind{?t}{pfl:tests}{#3}{ \testLink{\GetVal{?t}} }
+  }{{}}
+  %\emph{Implements:}\Bind{#3}{pfl:fulfills}{?c}{ \productFunctionLink{\GetVal{?c}} }
+  % my addition
+  \IfProperty{#3}{pfl:fulfills}{
+    \emph{Implements:}\Bind{#3}{pfl:fulfills}{?c}{ \productFunctionLink{\GetVal{?c}} }
+  }{{}}
+  \IfProperty{#3}{pfl:covered-by-mockup}{%
+    \\ \emph{Mockups:} \Bind{?m}{pfl:mockupsRequirement}{#3}{ \mockupLink{\GetVal{?m}} }
+  }
+  % addition end
+  
+  \par{#2}
+  \vspace{\baselineskip}
+}
+
+\newcommand\optionalRequirement[3]{
+  \stepcounter{optionalRequirement}
+  \par\textbf{#1}\IfProperty{#3}{pfl:funktional}{ (functional)}{}
+    \IfProperty{#3}{pfl:nichtFunktional}{ (non-functional)}{}\phantomsection\rdflabel{#3}
+  \marginid{\PrefixOptionalRequirement\arabic{optionalRequirement}}
+  \AddPropertyEx{pfl:fncname}{#1}
+  \AddPropertyEx{pfl:fncid}{\PrefixOptionalRequirement\arabic{optionalRequirement}}
+  \IfProperty{#3}{pfl:is-tested}{%
+    \\ \emph{Tested by:} \Bind{?t}{pfl:tests}{#3}{ \testLink{\GetVal{?t}} }
+  }{{}}\\
+  \emph{Implements:} \Bind{#3}{pfl:fulfills}{?c}{ \productFunctionLink{\GetVal{?c}} }
+  \par{#2}
+  \vspace{\baselineskip}
+  }
+
+  %arg1 = title, arg2 = state, arg3 = testSteps, arg4= label
+\newcommand\testWithState[4]{
+  \stepcounter{test}
+  \par\textbf{#1}\phantomsection\rdflabel{#4}
+  \marginid{\PrefixTest\arabic{test}}
+  \AddPropertyEx{pfl:tstname}{#1}
+  \AddPropertyEx{pfl:tstid}{\PrefixTest\arabic{test}}
+  \\ \emph{Tests:} \Bind{#4}{pfl:tests}{?f}{ \requirementsLink{\GetVal{?f}} }
+  \par
+  \textbf{State: }{#2}
+  \par
+  {#3}
+  \vspace{\baselineskip}
+  }
+
+%arg1 = title, arg2 = testSteps, arg3= label
+\newcommand\test[3]{
+  \stepcounter{test}
+  \par\textbf{#1}\phantomsection\rdflabel{#3}
+  \marginid{\PrefixTest\arabic{test}}
+  \AddPropertyEx{pfl:tstname}{#1}
+  \AddPropertyEx{pfl:tstid}{\PrefixTest\arabic{test}}
+  \\ \emph{Tests:} \Bind{#3}{pfl:tests}{?f}{ \requirementsLink{\GetVal{?f}} }
+  \par
+  {#2}
+  \vspace{\baselineskip}
+  }
+
+\newcommand\teststep[3]{\stepcounter{teststep}
+{\PrefixTest\arabic{test}.\arabic{teststep}}
+\begin{minipage}[t]{0.8\textwidth}\raggedright
+\textbf{State:} #1\par
+\textbf{Action:} #2\par
+\textbf{Reaction:} #3\par
+\end{minipage}
+\par}
+
+\newcommand\teststepnostate[2]{\stepcounter{teststep}
+{\PrefixTest\arabic{test}.\arabic{teststep}}
+\begin{minipage}[t]{0.8\textwidth}\raggedright
+	\textbf{Action:} #1\par
+	\textbf{Reaction:} #2\par
+	\vspace{4pt}
+\end{minipage}
+\par}

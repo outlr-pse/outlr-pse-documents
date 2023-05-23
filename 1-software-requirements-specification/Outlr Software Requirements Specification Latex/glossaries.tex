@@ -1,0 +1,142 @@
+% See https://de.overleaf.com/learn/latex/Glossaries
+
+\newcommand{\newacronymalwaysshort}[3]{
+\newglossaryentry{#1}{name={#2}, text={#2}, first={#2}, description={#3}, type=\acronymtype}
+}
+
+% Acronyms
+
+\newacronym{ODM}{ODM}{Outlier detection method}
+\newacronymalwaysshort{SQL}{SQL}{Structured Query Language, a language for accessing databases}
+\newacronymalwaysshort{HTML}{HTML}{HyperText Markup Language, a language to describe the structure of websites}
+\newacronymalwaysshort{CSS}{CSS}{Cascading Style Sheets, a language used to describe the appearance of a website}
+\newacronymalwaysshort{CSV}{CSV}{Comma-separated values, a file format commonly used for storing datasets}
+\newacronymalwaysshort{GUI}{GUI}{Grahpical User Interface}
+
+
+% Glossary entries
+
+\newglossaryentry{subspace-logic}
+{
+    name={Subspace logic},
+    text={subspace logic},
+    description={A logic that specifies in which \glspl*{subspace} a point of the dataset must be identified as an outlier in order to be contained in the \gls*{experiment} result}
+}
+
+\newglossaryentry{subspace}
+{
+    name={Subspace},
+    text={subspace},
+    description={A subspace of the complete dataset}
+}
+
+\newglossaryentry{datapoint}
+{
+    name={Data point},
+    text={data point},
+    description={A single entry of a dataset},
+}
+
+\newglossaryentry{index}
+{
+    name={Index of a \gls*{datapoint}},
+    text={index},
+    plural={indices},
+    description={The number of the row in which the \gls*{datapoint} is located in the given dataset}
+}
+
+\newglossaryentry{experiment}
+{
+    name={Experiment},
+    text={experiment},
+    description={A configurable execution of outlier detection methods on \glspl*{subspace} of a dataset}
+}
+
+\newglossaryentry{hpp}
+{
+    name={Hyperparameter},
+    text={hyperparameter},
+    description={Parameters that an \gls*{ODM} requires}
+}
+
+\newglossaryentry{ground-truth-file}
+{
+    name={Ground-truth file},
+    text={ground-truth file},
+    description={\gls*{CSV} file containing which points of a dataset are actually outliers}
+}
+
+\newglossaryentry{subspace-outlier}
+{
+    name={Subspace outlier},
+    text={subspace outlier},
+    description={A datapoint that is an outlier in a given \gls*{subspace}}
+}
+
+% frameworks and libraries
+
+\newglossaryentry{PyOD}
+{
+    name={PyOD},
+    description={Python library providing methods for outlier detection},
+}
+
+\newglossaryentry{overleaf}
+{
+    name={Overleaf},
+    description={Collaborative \LaTeX\ editor},
+}
+
+\newglossaryentry{texlive}
+{
+    name={TexLive},
+    description={A distribution of the \TeX\ typesetting system used by \gls*{overleaf}},
+}
+
+\newglossaryentry{typescript}
+{
+    name={TypeScript},
+    description={Programming language that can be used for web development}
+}
+
+\newglossaryentry{vue-js}
+{
+    name={Vue.js},
+    description={Front-end framework that can be used for building websites}
+}
+
+\newglossaryentry{postgresql}
+{
+    name={PostgreSQL},
+    description={A database system},
+}
+
+\newglossaryentry{python}
+{
+    name={Python},
+    description={Programming language commonly used in the field of machine learning and outlier detection}
+}
+
+\newglossaryentry{pandas}
+{
+    name={pandas},
+    description={\Gls*{python} library used for data analysis}
+}
+
+\newglossaryentry{flask}
+{
+    name={Flask},
+    description={\Gls*{python} web framework}
+}
+
+\newglossaryentry{git}
+{
+    name={Git},
+    description={A distributed version control system},
+}
+
+\newglossaryentry{gitlab}
+{
+    name={GitLab},
+    description={Web application for version control based on \gls*{git}},
+}

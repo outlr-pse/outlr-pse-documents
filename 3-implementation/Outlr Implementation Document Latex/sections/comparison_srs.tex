@@ -1,0 +1,63 @@
+\section{Overview of product functions, requirements defined in the Pflichtenheft}
+\subsection*{Product Functions}
+\subsubsection*{Mandatory}
+Looking back at the software requirements specification we met our goal of providing all the defined mandatory product functions:
+\begin{itemize}
+    \item \textbf{FM1:} User Management: allowing a user to create an account, log in and logout
+    \item \textbf{FM2:} Dashboard: providing an overview of all experiments
+    \item \textbf{FM3:} Create Experiment: allowing a user to create an experiment, that is select an ODM, the hyperparameters for it and specify subspace logic for it.
+    \item \textbf{FM4:} Run Experiment: run the experiment the user created
+    \item \textbf{FM5:} Experiment Results: providing the user an overview of his run experiment
+\end{itemize}
+\subsubsection*{Optional}
+As for the optional product functions we implemented:
+\begin{itemize}
+    \item \textbf{FO1}: providing the user with an appealing landing page 
+\end{itemize}
+However, we did not implement the other optional product functions, which were:
+\begin{itemize}
+    \item \textbf{FO2}: providing the user with an about us page giving users information about us
+    \item \textbf{FO3} providing the user with a page, which compares the experiments the user selected before
+\end{itemize}
+The reason for not implementing these optional product functions was that implementing the other mandatory pages was time-consuming, not leaving us with enough time to work on the listed optional product functions.
+
+\newpage
+\subsection*{Requirements}
+\subsubsection*{Mandatory}
+As for the mandatory requirements we implemented all the defined mandatory requirements, which were: 
+\begin{itemize}
+    \item \textbf{RM1:} Allowing users to create an account
+    \item \textbf{RM2:} Allowing users to log into their created accounts
+    \item \textbf{RM3:} Allowing users to log out of their account
+    \item \textbf{RM4:} Providing the user with a dashboard giving an overview of all experiments
+    \item \textbf{RM5:} Allowing the user to click on the experiments in the dashboard, redirecting the user to the experiment's result
+    \item \textbf{RM6:} Allowing users to name their experiment
+    \item \textbf{RM7:} Allowing users to upload a dataset (.csv) for an experiment
+    \item \textbf{RM8:} Allowing users to upload ground-truth to the provided dataset for an experiment
+    \item \textbf{RM9:} Allowing users to select subspaces from the dataset, which shall be processed by the subspace logic
+    \item \textbf{RM10:} Allowing users to specify subspace logic using logical or and logical and
+    \item \textbf{RM11:} Allowing users to customize the hyperparameters of the ODM they selected
+    \item \textbf{RM12:} Allowing users to select an ODM from a significant subset of the ODMs provided by PyOD
+    \item \textbf{RM13:} Allowing users to a created experiment
+    \item \textbf{RM14:} Allowing users to view the result of their experiment
+    \item \textbf{RM15:} Allowing users to download a .csv file containing the indices of the detected outliers
+    \item \textbf{RM16:} Outlr. is by default an English website
+    \item \textbf{RM17:} Passwords are somewhat securely stored as the password are not stored in plain text but hashed. To achieve superior security these could be salted user-wise.
+    \item \textbf{RM18:} Notifying the user of (unexpected) errors. The app mustn't crash when errors happen.
+    \item \textbf{RM19:} "Outlr." is reliable and mature.
+    \item \textbf{RM20:} "Outlr." is from our point of view easy to learn and provides efficient workflows.
+    \item \textbf{RM21} For good resource management, "Outlr." releases all resources of an experiment after it is run.
+    \item \textbf{RM22} "Outlr." is well documented and the code is easy to read.
+    \item \textbf{RM23} From our point of view, "Outlr." has an appealing and modern design.
+\end{itemize}
+The optional requirements we implemented were:
+\begin{itemize}
+    \item \textbf{RO7:} Allowing the user to search experiments from his dashboard and clear the search term if wanted 
+    \item \textbf{RO8:} Allowing the user to sort the dashboard by clicking on the table headers
+    \item \textbf{RO13:} Allowing the user to nest logical operators in the subspace logic defined for an experiment
+    \item \textbf{RO18:} Allowing the user to run experiments without passing a ground-truth file
+\end{itemize}
+However, we did not implement RO1-RO6, RO9-RO12, RO14-RO17, RO19-RO28. The reason for not implementing these optional requirements was that we did not have enough time to work on the listed optional requirements.
+
+
+\newpage

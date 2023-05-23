@@ -1,0 +1,401 @@
+\ProvidesPackage{design}
+\RequirePackage{rdfref-user, rdfref-query}
+\usepackage{suffix} % Used to define starred (*) commands
+
+% Packages
+\newcommand{\package}[1]{%
+    \renewcommand{\CurrentPackage}{#1}
+    \subsubsection{Package #1}\rdflabel{#1}
+}
+
+% Declarations ======================================================
+
+% Define class
+% #1: modifiers (ex. abstract)
+% #2: name of the class
+% #3: description
+% #4: attribute and method, ... sections
+\newcommand{\class}[4][]{%
+    \renewcommand{\CurrentDeclaration}{#2}%
+    \AddTripleEx{\CurrentPackage#2}{name}{#2}% % save name
+    \par\subsubsection*{Class \code{#1#2}}\declarationLabel{#2}
+    
+    #3 % Display description
+    
+    \displayExtendsAndImlements{\CurrentPackage#2}
+    
+    #4 % Display attributes and methods
+    
+    \displayChilds{\CurrentPackage#2}{Child classes}
+    \par
+}
+
+% Define interface
+% #1: modifiers (ex. sealed)
+% #2: name of the interface
+% #3: description
+% #3: attribute, method, ... sections
+\newcommand{\interface}[4][]{%
+    \renewcommand{\CurrentDeclaration}{#2}%
+    \AddTripleEx{\CurrentPackage#2}{name}{#2}% % save name
+    \par\subsubsection*{Interface \code{#1#2}}\declarationLabel{#2}
+    
+    #3 % Display description
+    
+    \displayExtendsAndImlements{\CurrentPackage#2}
+
+    #4 % Display attributes and methods
+    
+    \displayChilds{\CurrentPackage#2}{Extended by}
+    \displayImplementedBy{\CurrentPackage#2}
+    \par
+}
+
+% Define vue component
+% #1: modifiers (ex. abstract)
+% #2: name of the component
+% #3: description
+% #4: data, computed, ... sections
+\newcommand{\vueComponent}[4][]{%
+    \renewcommand{\CurrentDeclaration}{#2}%
+    \AddTripleEx{\CurrentPackage#2}{name}{#2}% % save name
+    \par\subsubsection*{Vue component \code{#1#2}}\declarationLabel{#2}
+    
+    #3 % Display description
+    
+    #4 % Display data, computed, methods, ...
+    \par
+}
+
+% Define enum
+% #1: name of the enum
+% #2: description
+% #3: enum entries
+% #4: attribute and methods section (leave empty of enum doesn't have any
+\newcommand{\enum}[4]{%
+    \renewcommand{\CurrentDeclaration}{#1}%
+    \AddTripleEx{\CurrentPackage#1}{name}{#1}% % save name
+    \par\subsubsection*{Enum \code{#1}}\declarationLabel{#1}
+
+    #2 % Display description
+
+    \begin{itemize}
+    #3 % Display enum entries
+    \end{itemize}
+
+    #4 % Display attribtues and methods
+    \par
+}
+
+
+% Additional declarations ===========================================
+
+% Add parent class to current declaration
+% #1: package of parent class
+% #2: parent class
+\newcommand{\extends}[2]{%
+    \AddTripleEx{#1#2}{is-extended}{yeah}%
+    \AddTripleEx{\CurrentPackage\CurrentDeclaration}{extends}{#1#2}%
+}
+
+% Add interface to current declaration
+% #1: package of interface
+% #2: interface
+\newcommand{\implements}[2]{%
+    \AddTripleEx{#1#2}{is-implemented}{yeah}%
+    \AddTripleEx{\CurrentPackage\CurrentDeclaration}{implements}{#1#2}%
+}
+
+% Add parent class to current declaration
+% #1: parent class
+\WithSuffix\newcommand\extends*[1]{%
+    %\AddTripleEx{#1}{is-extended}{yeah}%
+    \AddTripleEx{\CurrentPackage\CurrentDeclaration}{extendsX}{#1}%
+}
+
+% Add interface to current declaration
+% #1: interface
+\WithSuffix\newcommand\implements*[1]{%
+    %\AddTripleEx{#1}{is-implemented}{yeah}%
+    \AddTripleEx{\CurrentPackage\CurrentDeclaration}{implementsX}{#1}%
+}
+
+% attribute --------------------------------
+
+\newcommand{\attributeSection}[1]{\declarationSection{Attributes}{#1}}
+
+% Add attribute to current declaration
+% Use \attribute* (with *) if type has no reference (ex. int)
+% Optional argument #1: suffix for default values (must also contain = symbol)
+% #2: visibility (ex. public)
+% #3: name
+% #4: type
+\newcommand{\attribute}[4][]{%
+    \attributeWithId[#1]{#3}{#2}{#3}{#4}%
+}
+
+% Add attribute to current declaration
+% Type is displayed without reference
+% Optional argument #1: suffix for default values (must also contain = symbol)
+% Use \attribute* (with *) if type has no reference (ex. int)
+% #2: visibility (ex. public)
+% #3: name
+% #4: type
+\WithSuffix\newcommand\attribute*[4][]{%
+    \attributeWithId*[#1]{#3}{#2}{#3}{#4}%
+}
+
+% Add attribute to current declaration
+% Use \attribute* (with *) if type has no reference (ex. int)
+% Optional argument #1: suffix for default values (must also contain = symbol)
+% #2: id that should be given to the attribute (use \attribute if id should be the name)
+% #3: visibility (ex. public)
+% #4: name
+% #5: type
+\newcommand{\attributeWithId}[5][]{%
+    \attributeWithId*[#1]{#2}{#3}{#4}{\typeRef{#5}}%
+}
+
+% Add attribute to current declaration
+% Type is displayed without reference
+% Use \attribute* (with *) if type has no reference (ex. int)
+% Optional argument #1: suffix for default values (must also contain = symbol)
+% #2: id that should be given to the attribute (use \attribute* if id should be the name)
+% #3: visibility (ex. public)
+% #4: name
+% #5: type
+\WithSuffix\newcommand\attributeWithId*[5][]{%
+    \AddTripleEx{\CurrentDeclaration#2}{name}{#4}%
+    \AddTripleEx{\CurrentPackage\CurrentDeclaration#2}{name}{#4}%
+    \item{\code{#3 #4: #5 #1}\phantomsection\declarationLabel{\CurrentDeclaration#2}}\par
+}
+
+% method -----------------------------------
+
+\newcommand{\methodSection}[1]{\declarationSection{Methods}{#1}}
+
+% Add new method to current declaration
+% Use \param to specify parameters of this method
+% Use \method* (with *) if return type has no reference (ex. int)
+% #1: visibility
+% #2: name
+% #3: params
+% #4: return type
+\newcommand{\method}[4]{%
+    \methodWithId{#2}{#1}{#2}{#3}{#4}%
+}
+
+% Add new method to current declaration
+% Use \param to specify parameters of this method
+% Return type is displayed without reference
+% Use \method (without *) if return type is declared in this document (creates a reference)
+% #1: visibility
+% #2: name
+% #3: params
+% #4: return type
+\WithSuffix\newcommand\method*[4]{%
+    \methodWithId*{#2}{#1}{#2}{#3}{#4}%
+}
+
+% Add new method to current declaration
+% Use \param to specify parameters of this method
+% Use \method* (with *) if return type has no reference (ex. int)
+% #1: id that should be given to the method
+% #2: visibility
+% #3: name
+% #4: params
+% #5: return type
+\newcommand{\methodWithId}[5]{%
+    \methodWithId*{#1}{#2}{#3}{#4}{\typeRef{#5}}%
+}
+
+% Add new method to current declaration
+% Use \param to specify parameters of this method
+% Return type is displayed without reference
+% Use \method (without *) if return type is declared in this document (creates a reference)
+% #1: id that should be given to the method
+% #2: visibility
+% #3: name
+% #4: params
+% #5: return type
+\WithSuffix\newcommand\methodWithId*[5]{%
+    \AddTripleEx{\CurrentDeclaration#1}{name}{#3}%
+    \AddTripleEx{\CurrentPackage\CurrentDeclaration#1}{name}{#3}%
+    \item{\code{#2 #3(#4): #5}\phantomsection\declarationLabel{\CurrentDeclaration#1}}\par
+}
+
+% Vue stuff ------------------------------------------------------
+
+\newcommand{\dataSection}[1]{\declarationSection{Data}{#1}}
+\newcommand{\computedSection}[1]{\declarationSection{Computed}{#1}}
+\newcommand{\propSection}[1]{\declarationSection{Props}{#1}}
+\newcommand{\componentSection}[1]{\declarationSection{Used components}{#1}}
+\newcommand{\watchSection}[1]{\declarationSection{Watches}{#1}}
+\newcommand{\emitSection}[1]{\declarationSection{Emits}{#1}}
+\newcommand{\slotSection}[1]{\declarationSection{Slots}{#1}}
+
+% Define a slot with name #1
+\newcommand{\slot}[1]{%
+    \AddTripleEx{\CurrentDeclaration#1}{name}{#1}%
+    \AddTripleEx{\CurrentPackage\CurrentDeclaration#1}{name}{#1}%
+    \item{\code{#1}\phantomsection\declarationLabel{\CurrentDeclaration#1}}\par
+}
+
+% Define a component that is used by the current vue component declaration with type reference
+\newcommand{\usedComponent}[1]{%
+    \AddTripleEx{\CurrentDeclaration#1}{name}{#1}%
+    \AddTripleEx{\CurrentPackage\CurrentDeclaration#1}{name}{#1}%
+    \item{\code{\typeRef{#1}}\phantomsection\declarationLabel{\CurrentDeclaration#1}}\par
+}
+
+% Define a component that is used by the current vue component declaration without type reference
+\WithSuffix\newcommand\usedComponent*[1]{%
+    \AddTripleEx{\CurrentDeclaration#1}{name}{#1}%
+    \AddTripleEx{\CurrentPackage\CurrentDeclaration#1}{name}{#1}%
+    \item{\code{#1}\phantomsection\declarationLabel{\CurrentDeclaration#1}}\par
+}
+
+% Enum entries ------------------------------------------------------
+
+% Define enum entry with name.
+\newcommand{\enumEntry}[1]{
+    \AddTripleEx{\CurrentDeclaration#1}{name}{#1}%
+    \AddTripleEx{\CurrentPackage\CurrentDeclaration#1}{name}{#1}%
+    \item{\code{#1}\phantomsection\declarationLabel{\CurrentDeclaration#1}}\par
+}
+% Define enum entry with name and value
+\newcommand{\enumEntryWithValue}[2]{
+    \AddTripleEx{\CurrentDeclaration#1}{name}{#1}%
+    \AddTripleEx{\CurrentPackage\CurrentDeclaration#1}{name}{#1}%
+    \item{\code{#1 = #2}\phantomsection\declarationLabel{\CurrentDeclaration#1}}\par
+}
+
+% References ========================================================
+
+% Reference a package
+\newcommand{\packageRef}[1]{\hyperref[#1]{\code{#1}}}
+
+% Reference a type that was declared in this document (ex. a class)
+% optional argument: package
+\newcommand{\typeRef}[2][]{\hyperref[#1#2]{\code{#2}}}
+
+% Reference a type with package prefixed to it
+% #1: package
+% #2: type
+\newcommand{\typeRefFull}[2]{\packageRef{#1}\hyperref[#1#2]{\code{.#2}}}
+
+
+% member ref ------------------------------------
+
+% Reference a member (attribute, method, ...)
+% Display just member name
+% optional argument: package
+% first argument: class, interface, ...
+% second argument: id
+\newcommand{\memberRef}[3][]{%
+    \hyperref[#1#2#3]{\code{\GetProperty{#1#2#3}{name}}}
+}
+% Reference a member (attribute, method, ...)
+% Display class.member
+% optional argument: package
+% first argument: class, interface, ...
+% second argument: id
+\newcommand{\memberRefLong}[3][]{%
+    \typeRef{#1#2}\code{\hyperref[#1#2#3]{.\GetProperty{#1#2#3}{name}}}%
+}
+% Reference a member (attribute, method, ...)
+% Display package.class.member
+% optional argument: package
+% first argument: class, interface, ...
+% second argument: id
+\newcommand{\memberRefFull}[3]{%
+    \packageRef{#1}\code{\hyperref[#1#2]{.#2}\hyperref[#1#2#3]{.\GetProperty{#1#2#3}{name}}}%
+}
+
+% Internal ==========================================================
+
+% To remember
+% \rdflabel sets \CurrentObject which is used for \AddProperty(Ex)
+% A % (percent symbol) after an opening { prevents a newline
+% the suffix -Ex stands for Expand and it is better to not understand what this means
+
+% Define how code looks
+\newcommand{\code}[1]{%
+    \texttt{#1}%
+}
+
+% Todo element
+%\newcommand{\todo}[1]{\textcolor{red}{\textbf{TODO} #1}}
+\newcommand{\todo}[1]{%
+    %\todoInternal{#1}% % Comment this to disable all TODOs
+}
+
+% Don't use this. Use \todo instead
+\newcommand{\todoInternal}[1]{%
+    \textcolor{red}{TODO: #1}%
+    \@latex@warning{There is a TODO in the document}%
+}
+
+% Helper to indent
+\newcommand{\tab}{\-\hspace{0.7cm}}
+
+% variables
+\newcommand{\CurrentDeclaration}{ErrorNoDeclaration}
+\newcommand{\CurrentPackage}{global}
+
+% Set label (sets label with and without package)
+\newcommand{\declarationLabel}[1]{\rdflabel{#1}\rdflabel{\CurrentPackage#1}}
+
+% Helper for referencing types without using \GetProperty (which somehow breaks everything)
+% This method also handles the case for types that have no reference (suffix X at property name)
+% #1: Subject that has the wanted type as a property
+% #2: name of the property that contains the type that should be referenced
+\newcommand{\propTypeRef}[2]{%
+    \Bind{#1}{#2}{?fhgghfghhh}{\typeRef{\GetVal{?fhgghfghhh}}}%
+    \Bind{#1}{#2X}{?fhgghfghhhf}{\GetVal{?fhgghfghhhf}}
+}
+
+% sub routines -------------------------------
+
+% Reference a type by passing packagename followed by declaration name with nothing in between
+\newcommand{\typeRefById}[1]{%
+    \hyperref[#1]{\code{\GetProperty{#1}{name}}}
+}
+
+% #1: delcaration id, which is packagename followed by declaration name and nothing in between
+\newcommand{\displayExtendsAndImlements}[1]{%
+    \IfProperty{#1}{extends}{%
+        \code{extends \Bind{#1}{extends}{?f}{\typeRefById{\GetVal{?f}}}%
+            \Bind{#1}{extendsX}{?f}{\GetVal{?f}}} % Extends
+        \IfProperty{#1}{implements}{\newline}{} % Newline if extends and implements
+    }{}%
+    \IfProperty{#1}{implements}{%
+        \code{implements \Bind{#1}{implements}{?f}{\typeRefById{\GetVal{?f}}}%
+            \Bind{#1}{implementsX}{?f}{\GetVal{?f}}} % Implements
+    }{}%
+}
+
+\newcommand{\displayChilds}[2]{%
+    \IfProperty{#1}{is-extended}{%
+        \emph{#2} %
+        \code{\Bind{?f}{extends}{#1}{\typeRefById{\GetVal{?f}}}}%
+        \code{\Bind{?f}{extendsX}{#1}{\GetVal{?f}}}%
+        \par
+    }{}%
+}
+
+\newcommand{\displayImplementedBy}[1]{%
+    \IfProperty{#1}{is-implemented}{%
+        \emph{Implemented by} %
+        \code{\Bind{?f}{implements}{#1}{\typeRefById{\GetVal{?f}}}}%
+        \code{\Bind{?f}{implementsX}{#1}{\GetVal{?f}}}%
+        \par
+    }{}%
+}
+
+\newcommand{\declarationSection}[2]{%
+    \par\emph{#1}
+    \begin{itemize}
+        #2
+    \end{itemize}
+}

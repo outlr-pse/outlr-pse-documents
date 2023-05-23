@@ -1,0 +1,70 @@
+% first param: initial state on first message
+% second param: text width percentage
+% third param: image url
+% fourth param: caption 
+% fifth param: label (einfach <name> NICHT fig:<name>)
+\newcommand{\sequenceDiagram}[5]{
+\par{\textbf{Initial state:} #1}\label{#5}
+\begin{figure}[!ht]
+    \centering
+    \includesvg[width=#2\textwidth]{#3}
+    \centering
+    \caption{#4}\label{fig:#5}
+\end{figure}
+}
+
+% content start
+
+\section{Sequence diagrams}
+\subsection*{User Management:}
+\sequenceDiagram{The user has entered his register data in the register form and pressed the submit button.}{1}{images/sequence_diagrams/register_valid_data_diagram}{Creating an account when valid data is provided}{register_valid_data_diagram}
+
+\sequenceDiagram{The user has entered his register data and entered a username, which is already taken by a different user in the register form and pressed the submit button.}{1}{images/sequence_diagrams/register_username_already_exists_diagram}{Trying to register with username, which is already taken}{register_username_already_exists_diagram}
+
+
+\newpage
+\sequenceDiagram{The user has entered valid login data and pressed the submit button.}{1}{images/sequence_diagrams/logging_in_valid_data_diagram}{Logging in with valid data}{logging_in_valid_data_diagram}
+
+\sequenceDiagram{The user entered a wrong password in the form and pressed the submit button.}{1}{images/sequence_diagrams/logging_in_when_wrong_password_diagram}{Trying to log in although provided password is wrong}{logging_in_with_wrong_password_diagram}
+
+\newpage
+\sequenceDiagram{The user entered the logout button from the navigation bar.}{0.8}{images/sequence_diagrams/logout_diagram}{Logging out when logged in. This only works when the user is logged in, which is why the back-end checks whether an access token is sent with request, therefore the "@jwt-required"}{logout_diagram}
+
+
+\subsection*{Dashboard:}
+\sequenceDiagram{The user has clicked on navigate to dashboard and gets redirected to the \typeRef{DashboardView}}{1}{images/sequence_diagrams/dashboard_load}{When the \typeRef{DashboardView} is mounted to the DOM it requests all experiments the user has created from the backend and shows the data in the \typeRef{DashboardTable}}{dashboard_load}
+
+\newpage
+
+\sequenceDiagram{The user is on the Dashboard.}{1}{images/sequence_diagrams/click_on_experiment_on_dashboard}{The user clicks on an experiment in the dashboard table. The user then gets redirected to the \typeRef{ExperimentResultView}. The experiment id gets also passed to the \typeRef{ExperimentResultView}. The \typeRef{ExperimentResultView} then requests the experiment from the backend by id and shows the user the data}{dashboard_click}
+
+
+\subsection*{Experiment creation:}
+
+\sequenceDiagram{The user is on the \typeRef{CreateExperimentView}}{1}{images/sequence_diagrams/upload_valid_dataset}{The user trys to upload a valid dataset.}{valid_dataset}
+
+\sequenceDiagram{The user is on the \typeRef{CreateExperimentView}}{1}{images/sequence_diagrams/upload_invalid_dataset}{The user trys to upload a invalid dataset.}{invalid_dataset}
+
+\newpage
+
+\sequenceDiagram{The user is on the \typeRef{CreateExperimentView}}{1}{images/sequence_diagrams/upload_valid_groundtruth}{The user trys to upload a valid ground truth file.}{valid_groundtruth}
+
+\sequenceDiagram{The user is on the \typeRef{CreateExperimentView}}{1}{images/sequence_diagrams/upload_invalid_groundtruth}{The user trys to upload a invalid ground truth file.}{invalid_groundtruth}
+
+\sequenceDiagram{The user is on the \typeRef{CreateExperimentView}}{1}{images/sequence_diagrams/select_odm}{The user selects and odm from a dropdown menu.}{odm_selection}
+
+\newpage
+
+\sequenceDiagram{The user is on the \typeRef{CreateExperimentView}}{1}{images/sequence_diagrams/valid_hyperparam_subspacelogic}{The user inserts correct hyperparameters and correct subspacelogic.}{param_logic_input}
+
+\sequenceDiagram{The user is on the \typeRef{CreateExperimentView}}{1}{images/sequence_diagrams/invalid_hyperparam_subspacelogic}{The user inserts incorrect hyperparameters or incorrect subspacelogic.}{invalid_param_logic_input}
+
+\newpage
+
+\sequenceDiagram{The user is on the \typeRef{CreateExperimentView}}{1}{images/sequence_diagrams/click_run_experiment}{The user provide all data required for an experiment run.}{experiment_run}
+
+
+\sequenceDiagram{The user is on the \typeRef{CreateExperimentView}}{0.6}{images/sequence_diagrams/missing_data}{There is still required data missing.}{missing data}
+
+\newpage
+

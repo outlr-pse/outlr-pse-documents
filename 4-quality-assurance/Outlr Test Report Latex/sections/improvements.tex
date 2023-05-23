@@ -1,0 +1,70 @@
+\section{Improvements}
+
+\improvement{Remove Dataset Class}{
+    The \code{Dataset} class bundles the dataset name and the \gls{pandas} \code{DataFrame}. But since the dataset name is stored in the database there must be a single attribute for it. The \code{Dataset.name} is therefore never used.
+}{
+    Instead of a \code{Dataset} class \gls{pandas} \code{DataFrame}s are used directly.
+}
+
+\improvement{Improve Execution}{
+    The experiment execution is built around the \gls{asyncio} library.
+}{
+    The experiment execution is now built around the \gls{concurrent-futures} library. This library is better suited for CPU-bound tasks while \gls{asyncio} is better suited for IO-bound tasks.
+    However, the benefits of \gls{asyncio} are still used, since the two libraries are compatible.
+    In particular, experiments are now executed as coroutines in an \gls{asyncio} event loop that runs on a single background thread. There, the subspace logic evaluation, metrics calculations, and the waiting for the individual \glspl{subspace} is done. The individual \glspl{subspace} however, are run in a \gls{concurrent-futures} \code{ProcessPoolExecutor}, which holds a pool of processes to distribute individual \gls{ODM} calls.
+}
+
+\improvement{Better \Gls*{subspace-logic} Parser}{
+    Multiple operators are possible, but they can be applied only right associatively. The simple case of \code{([0] or [1]) and ([2] or [3])} is not possible.
+    Additionally, many incorrect inputs are accepted.
+}{
+    Now, \gls{subspace-logic} can be nested using parenthesis. Many cases of incorrect inputs are caught and not parsed.
+}
+
+\improvement{Dashboard Table Metadata}{
+    Table sorting was accomplished by comparing the string values of each cell.}
+{
+    Each cell now contains a tuple with both metadata and string representation. This allows for more accurate sorting, as the rows can be sorted based on the metadata of each cell rather than simply comparing string values.
+}
+
+\improvement{Dashboard Table Sorting Options}{
+    Table sorting was reliant on the header strings to indicate which cell the table should be sorted by.
+}{   
+    Each table header now contains a tuple consisting of a Sort Enum entry and the header string. This Enum makes the sorting selection process easier and more efficient.
+}
+
+\improvement{Dashboard Table Date Shown}{
+    The date on the dashboard table was previously displayed in a standard date format.
+}{
+    Now, when an experiment is created less than a week ago, the time is shown as [time] ago.
+}
+
+\improvement{Show \Gls*{subspace-logic} on \Gls*{experiment} Result Page}{
+    \Gls{subspace-logic} is never displayed after an \gls{experiment} is created.
+}{
+    The \gls{subspace-logic} of an \gls{experiment} is displayed on the \gls*{experiment} result page.
+}
+
+\improvement{Subspace Logic Indicator}{
+    Incorrect subspace logic was indicated by an unusable button.
+}{
+    Now, incorrect subspace logic is directly indicated on the text area field with a red border. The button is still unusable with incorrect subspace logic.
+}
+
+\improvement{Enhanced Password Storage Security}{
+    Password were stored in the database after being hashed with the SHA-256 hashing algorithm.
+}{
+    Passwords now are hashed using bcrypt, which is specifically designed for password hashing. Bcrypt incorporates a cost parameter that makes the hashing process deliberately slower. This means that each password hash computation takes a longer time to complete, making it much more difficult for attackers to perform brute force attacks. It also includes salting as part of its hashing process, further increasing the security of the password hash.
+}
+
+\improvement{Minor Improvement to User Experience when Registering}{
+    The green color used to mark valid input was quite bright.
+}{
+     The color to mark valid input was changed to a more subtle green. 
+}
+
+\improvement{AUC and ROC Curve}{
+    The AUC and ROC Curve was neither stored in the database nor displayed to the user.
+}{
+    The AUC and ROC Curve are stored in the database. They get displayed to the user on the experiment result page.
+}

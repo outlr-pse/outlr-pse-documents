@@ -1,0 +1,67 @@
+\section{Design changes}
+
+\subsection{General}
+Since both \gls{python} and \gls{typescript} are not strictly object-oriented, we implemented some static utility classes or singleton classes from the class diagram by just writing the attributes and methods in the global scope.
+
+\subsection{Back-end}
+\package{backend.models.odm}
+\code{ODM} is now an abstract class with an abstract \code{run\_odm} method.
+\code{PyODM} implements \code{ODM} and calls the \gls{PyOD} library in the \code{run\_odm} method.
+\code{check\_params} was removed.
+
+\package{backend.models.experiment}
+This package now contains the \code{Experiment}, \code{ExperimentResult}, \code{Subspace}, and \code{Outlier} classes.
+
+\code{Subspace}s are now owned by the an \code{Experiment} directly instead of by an \code{ExperimentResult}. This is necessary because \code{Subspace}s exist before an \code{ExperimentResult} exists.
+
+\code{Experiment} now has additional attributes:
+\begin{itemize}
+    \item \code{dataset\_name: str}
+    \item \code{error\_json: dict | None} contains an error if the experiment execution failed
+    \item \code{ground\_truth: np.NDArray | None} instead of \code{true\_outliers} contains the ground truth array of zeros and ones, is not stored in the database
+\end{itemize}
+
+\package{backend.execution}
+No \code{QueueScheduler}s were implemented. Instead, a \code{CoroutineExperimentScheduler} and a \code{SequentialODMScheduler} were implemented.
+
+\package{backend.parsers}
+Moved all functions to module \code{util.data} and renamed them to the following:
+\begin{itemize}
+    \item \code{csv\_to\_dataset(name: str, dataset: str): Dataset}
+    \item \code{csv\_to\_numpy\_array(csv: str): NDArray}
+    \item \code{write\_list\_to\_csv(data: list[int], path: str): BytesIO}
+\end{itemize}
+
+\package{backend.api}
+The endpoint \code{/experiment/upload-files} was created to upload the dataset and ground-truth files before experiment creation.\\
+This was necessary as http only allows the content type to be either form-data or text/json. The former can contain raw files, the latter is used to give more information about the experiment to be created.
+
+\package{backend.database}
+Added more helper functions which were required in other places to \code{DatabaseAccess}.
+
+
+\subsection{Front-end}
+
+\package{frontend.components.basic}
+The \code{Icon} enum was removed. Icons are now imported as a font.
+
+\package{frontend.api}
+\code{requestTokenCheck()} was renamed to \code{requestTokenIdentity()} and returns a JSON containing the username to the token if valid. If not valid as all other JSONs the JSON contains an error key.
+
+To \code{AuthServices} the method
+\code{intialValidityCheck()}, which, when the HTTP request has a valid token, sets the Vuex state, was added. Furthermore \code{validateUsername()} and \code{validatePassword()} were added.
+
+\package{frontend.components.views.dashboard}
+Added a \code{DashboardSortColumn} enum for sorting the dashboard table.
+
+\package{frontend.components.views.createExperimentView}
+The \code{ExperimentTitleField} vue component was removed and replaced by plain HTML code.
+
+\package{frontend.models}
+Because of the changes to our JSON files we had to implement different versions of the \code{fromJSONObject()} method with different function headers. And therefore we could not use the \code{JSONDeseializable} in all of our frontend modles.
+
+\package{frontend.components.views}
+The \code{LoginForm} and \code{RegisterForm} vue components also got removed and replaced by plain HTML code.
+
+\newpage
+

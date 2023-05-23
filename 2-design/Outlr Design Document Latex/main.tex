@@ -1,0 +1,67 @@
+\documentclass[11pt, english]{scrartcl}
+
+\usepackage[utf8]{inputenc}
+\font\myfont=cmr11 at 60pt
+\title{Design document\\~\\~\\~\\{\myfont Outlr\textcolor[HTML]{925FF0}{.}}}
+\subtitle{A web application for analyzing subspace-outlier on high dimensional datasets}
+\author{Bennet Alexander Hörmann, Salomo Hummel,\\
+Simeon Hendrik Schrape, Erik Bowen Wu, Udo Ian Zucker}
+
+\usepackage{tabularx}
+\usepackage{blindtext}
+\usepackage{hyperref}
+\usepackage[T1]{fontenc}
+\usepackage[ddmmyyyy]{datetime} % must be after babel
+\renewcommand{\dateseparator}{.}
+\usepackage[margin=1.6in]{geometry} % Page margins
+\usepackage{amsmath} % for $\text{}$
+\usepackage[nameinlink]{cleveref}
+\usepackage[section]{placeins}
+\usepackage{xcolor}
+\usepackage{svg}
+\usepackage{graphicx}
+\usepackage[acronyms, toc]{glossaries}
+\usepackage[toc, page]{appendix}
+\usepackage{parskip} % Adds vertical space to paragraphs instead of indentation
+\usepackage{design} % our own package
+
+\hypersetup{
+	pdftitle={Software Requirements Specification},
+	colorlinks=true,
+        allcolors = [HTML]{045c5c}
+}
+
+% Glossary setup
+\makeglossaries
+\loadglsentries{glossaries}
+
+\begin{document}
+
+\maketitle\pagebreak
+
+\tableofcontents\pagebreak
+
+\include{sections/changes_to_requirements.tex}
+
+\include{sections/basic-architecture-and-structure.tex}
+
+\include{sections/object-model.tex}
+
+\include{sections/routing.tex}
+
+\include{sections/authentication.tex}
+
+\include{sections/sequences.tex}
+
+\include{sections/database.tex}
+
+\begin{appendices}
+
+\printglossary\clearpage
+\printglossary[type=\acronymtype]\clearpage % print acronyms
+
+\include{sections/appendix/complete-class-diagram.tex}
+
+\end{appendices}
+
+\end{document}
